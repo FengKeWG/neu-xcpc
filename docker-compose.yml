@@ -1,0 +1,52 @@
+services:
+  mariadb:
+    image: dockerproxy.com/library/mariadb:latest
+    container_name: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=domjudge
+      - MYSQL_USER=domjudge
+      - MYSQL_PASSWORD=domjudge
+      - MYSQL_DATABASE=domjudge
+    command: --max-connections=1000 --max-allowed-packet=512M --innodb_snapshot_isolation=OFF
+    ports:
+      - 127.0.0.1:13306:3306
+    volumes:
+      - /mnt/data/domjudge-db:/var/lib/mysql
+    restart: unless-stopped
+
+  domjudge:
+    image: dockerproxy.com/domjudge/domjudge-contributor:latest
+    container_name: domjudge
+    depends_on:
+      - mariadb
+    privileged: true
+    # 需要 Docker Compose >= 2.15
+    cgroup: host
+    ports:
+      - 12345:80
+    volumes:
+      - /mnt/data/domjudge:/opt/domjudge
+      - /sys/fs/cgroup:/sys/fs/cgroup
+      - /chroot
+    working_dir: /opt/domjudge
+    environment:
+      - PROJECT_DIR=/opt/domjudge
+      - DEBMIRROR=https://mirrors.aliyun.com/debian
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+  xcpc-tools:
+    image: dockerproxy.com/library/debian:bookworm-slim
+    container_name: xcpc-tools
+    user: "1000:1000"
+    working_dir: /app
+    command: ["/app/xcpc-tools"]
+    volumes:
+      - /mnt/data/xcpc-tools:/app
+    ports:
+      - 5283:5283
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+
