@@ -1,12 +1,15 @@
 ## 一键部署：DOMjudge + MariaDB + XCPC-TOOLS
 
-### 1) 准备宿主目录与权限（仅首次）
+### 1) 准备宿主目录与权限
 
 ```bash
-sudo mkdir -p /mnt/data/domjudge /mnt/data/domjudge-db /mnt/data/xcpc-tools
-sudo chown -R 1000:1000 /mnt/data/domjudge /mnt/data/domjudge-db /mnt/data/xcpc-tools
-sudo chmod 755 /mnt/data/domjudge /mnt/data/xcpc-tools
-sudo chmod +x /mnt/data/xcpc-tools/xcpc-tools
+git clone https://github.com/FengKeWG/neu-xcpc.git
+cd neu-xcpc
+sudo chown -R 1000:1000 ./domjudge ./xcpc-tools
+sudo chmod 755 ./domjudge ./xcpc-tools
+sudo chmod +x ./xcpc-tools/xcpc-tools-linux
+sudo bash -lc 'grep -rIl "^#!" ./domjudge | xargs -r chmod +x'
+sudo chmod +x ./domjudge/configure ./domjudge/etc/gen_all_secrets
 ```
 
 ### 2) 启动数据库与 DOMjudge（首次会自动初始化与构建 chroot）

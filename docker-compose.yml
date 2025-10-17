@@ -11,7 +11,7 @@ services:
     ports:
       - 127.0.0.1:13306:3306
     volumes:
-      - /mnt/data/domjudge-db:/var/lib/mysql
+      - ./domjudge-db:/var/lib/mysql
     restart: unless-stopped
 
   domjudge:
@@ -25,7 +25,7 @@ services:
     ports:
       - 12345:80
     volumes:
-      - /mnt/data/domjudge:/opt/domjudge
+      - ./domjudge:/opt/domjudge
       - /sys/fs/cgroup:/sys/fs/cgroup
       - /chroot
     working_dir: /opt/domjudge
@@ -42,7 +42,7 @@ services:
     working_dir: /app
     command: ["/app/xcpc-tools"]
     volumes:
-      - /mnt/data/xcpc-tools:/app
+      - ./xcpc-tools:/app
     ports:
       - 5283:5283
     environment:
