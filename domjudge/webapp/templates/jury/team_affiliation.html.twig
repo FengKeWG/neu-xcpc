@@ -1,0 +1,114 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}Affiliation {{ teamAffiliation.affilid }} - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Affiliation {{ teamAffiliation.name }}</h1>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ teamAffiliation.affilid }}</td>
+                </tr>
+                <tr>
+                    <th>External ID</th>
+                    <td>{{ teamAffiliation.externalid }}</td>
+                </tr>
+                <tr>
+                    <th>ICPC ID</th>
+                    <td>
+                        {% if teamAffiliation.icpcid %}
+                            {{ teamAffiliation.icpcid }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Shortname</th>
+                    <td>{{ teamAffiliation.shortname }}</td>
+                </tr>
+                <tr>
+                    <th>Logo</th>
+                    <td class="affiliation-logo">
+                        {% set affiliationId = teamAffiliation.externalid %}
+                        {% set affiliationLogo = affiliationId | assetPath('affiliation') %}
+                        {% if affiliationLogo %}
+                            <img src="{{ asset(affiliationLogo) }}" alt="{{ teamAffiliation.shortname }}"
+                                 title="{{ teamAffiliation.shortname }}" class="affiliation-logo"/>
+                        {% else %}
+                            Not available
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if showFlags and teamAffiliation and teamAffiliation.country %}
+                    <tr>
+                        <th>Country</th>
+                        <td>
+                            {{ teamAffiliation.country | countryFlag(true) }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if teamAffiliation.internalcomments is not empty %}
+                    <tr>
+                        <th>Comments</th>
+                        <td>{{ teamAffiliation.internalcomments }}</td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+
+    {%- if is_granted('ROLE_ADMIN') -%}
+        <p>
+            {{ button(path('jury_team_affiliation_edit', {'affilId': teamAffiliation.affilid}), 'Edit', 'primary', 'edit') }}
+            {{ button(path('jury_team_affiliation_delete', {'affilId': teamAffiliation.affilid}), 'Delete', 'danger', 'trash-alt', true) }}
+        </p>
+    {% endif %}
+
+    <h3>Teams</h3>
+    {% if teamAffiliation.teams is empty %}
+        <p class="nodata">no teams</p>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-4">
+                <table class="data-table table table-sm table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th style="text-align: right;">ID</th>
+                        <th>Teamname</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for team in teamAffiliation.teams %}
+                        <tr>
+                            <td style="text-align: right;">
+                                <a href="{{ path('jury_team', {'teamId': team.teamid}) }}">{{ team | entityIdBadge('t') }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ path('jury_team', {'teamId': team.teamid}) }}">{{ team.effectiveName }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if scoreboard is defined %}
+            <div data-ajax-refresh-target>
+                {% include 'partials/scoreboard_table.html.twig' with {displayRank: true, jury: true} %}
+            </div>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

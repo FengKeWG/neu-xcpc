@@ -1,0 +1,81 @@
+:root {
+    /** WCAG fixes begin **/
+    --btn-primary-bg: #0072ed;
+    /** WCAG fixes end **/
+}
+
+/** WCAG fixes start **/
+.btn-primary {
+    background: var(--btn-primary-bg);
+}
+
+.text-muted {
+    color: #616870 !important;
+}
+/** WCAG fixes end **/
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+}
+
+.form-signin {
+  max-width: 800px;
+  padding: 15px;
+}
+#loginform {
+  text-align: center;
+}
+.form-signin .form-floating:focus-within {
+  z-index: 2;
+}
+.form-signin input[type="text"] {
+  margin-bottom: 15px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 5px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin button[type="submit"] {
+  margin-top: 11px;
+}
+
+/* These classes are to make our additional login methods fit side by side with
+   the main login method. */
+.main-login, .additional-logins {
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+  min-height: 220px;
+}
+.main-login {
+  width:280px;
+}
+
+.additional-logins {
+  width: 330px;
+}
+.login-content {
+  min-height: 105px;
+  /* This was added as it seems to make the buttons from the main
+     login and additional login forms line up. I don't know why.
+  */
+  border-bottom: 2px solid rgba(0,0,0,0);
+}
+div.vertical-line{
+  width: 1px;
+  background-color: #cecece;
+  height: 230px;
+  display: inline-block;
+}
+
+a {
+    text-decoration: none;
+}

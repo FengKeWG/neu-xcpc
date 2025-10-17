@@ -1,0 +1,8 @@
+controllers:
+    resource: ../../src/Controller/**/*
+    exclude: ../../src/Controller/API
+    type: attribute
+
+kernel:
+    resource: ../../src/Kernel.php
+    type: attribute

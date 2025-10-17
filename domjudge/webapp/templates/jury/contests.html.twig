@@ -1,0 +1,97 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}Contests - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    {{ macros.toggle_extrahead() }}
+{% endblock %}
+
+{% block content %}
+    <h1>Contests</h1>
+
+    <h3>Current contests</h3>
+
+    {% for contest in current_contests %}
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        {{ contest.name }} ({{ contest.shortname }} - c{{ contest.cid }})
+                        {% if contest.locked %}
+                            <i class="fas fa-lock"></i>
+                        {% endif %}
+                        <a class="fa-regular fa-folder-open" style="float: right; color: black" href={{ path('jury_contest', {'contestId': contest.cid}) }}></a>
+                    </div>
+                    <div class="card-body">
+                        {% if not contest.starttimeEnabled and contest.finalizetime is not empty %}
+                            <div class="alert alert-warning">
+                                <strong>Warning:</strong> start time is undefined, but contest is finalized!
+                            </div>
+                        {% endif %}
+                        <table class="table table-hover">
+                            <tbody>
+                            {% for type, data in contest.dataForJuryInterface %}
+                                <tr>
+                                    <td class="{{ data.class|default('') }}">
+                                        {% if data.icon is defined %}
+                                            <i class="fas fa-{{ data.icon }}"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td class="{{ data.class|default('') }}"><b>{{ data.label }}:</b></td>
+                                    <td class="{{ data.class|default('') }}">{{ data.time }}</td>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <td>
+                                            {% if data.show_button %}
+                                                {% set button_label =  type ~ " now" %}
+                                                {{ button(path('jury_contest_donow', {'contestId': contest.cid, 'time': type}), button_label, 'primary btn-sm') }}
+                                            {% endif %}
+                                            {% if data.extra_button is defined %}
+                                                {{ button(path('jury_contest_donow', {'contestId': contest.cid, 'time': data.extra_button.type}), data.extra_button.label, 'primary btn-sm') }}
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {% if upcoming_contest is empty %}
+            <div class="alert alert-danger">
+                No upcoming contest
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <strong>No active contest.</strong> Upcoming:<br/>
+                <p>
+                    <i>{{ upcoming_contest.name }} ({{ upcoming_contest.shortname }})</i>;
+                    active from {{ upcoming_contest.activatetime | printtime('D d M Y H:i:s T') }}
+                </p>
+                {{ button(path('jury_contest_donow', {'contestId': upcoming_contest.cid, 'time': 'activate'}), 'Activate now', 'primary') }}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <h3>All available contests</h3>
+
+    {{ macros.table(contests_table, table_fields) }}
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <p>
+            {{ button(path('jury_contest_add'), 'Add new contest', 'primary', 'plus') }}
+            {{ button(path('jury_import_export', {'_fragment':'contests'}), 'Import contest', 'primary', 'upload') }}
+        </p>
+    {% endif %}
+
+{% endblock %}
+
+{% block extrafooter %}
+    {{ macros.toggle_autosubmit_extrafooter() }}
+{% endblock %}
+

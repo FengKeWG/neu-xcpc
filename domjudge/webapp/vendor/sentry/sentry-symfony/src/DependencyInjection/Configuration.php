@@ -1,0 +1,233 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Sentry\SentryBundle\DependencyInjection;
+
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Sentry\Options;
+use Sentry\SentryBundle\ErrorTypesParser;
+use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Messenger\MessageBusInterface;
+
+final class Configuration implements ConfigurationInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('sentry');
+
+        /** @var ArrayNodeDefinition $rootNode */
+        $rootNode = method_exists(TreeBuilder::class, 'getRootNode')
+            ? $treeBuilder->getRootNode()
+            : $treeBuilder->root('sentry');
+
+        $inAppExcludes = [
+            '%kernel.cache_dir%',
+            '%kernel.project_dir%/vendor',
+        ];
+
+        if (Kernel::VERSION_ID >= 50200) {
+            $inAppExcludes[] = '%kernel.build_dir%';
+        }
+
+        $rootNode
+            ->children()
+                ->scalarNode('dsn')
+                    ->info('If this value is not provided, the SDK will try to read it from the SENTRY_DSN environment variable. If that variable also does not exist, the SDK will not send any events.')
+                ->end()
+                ->booleanNode('register_error_listener')->defaultTrue()->end()
+                ->booleanNode('register_error_handler')->defaultTrue()->end()
+                ->scalarNode('logger')
+                    ->info('The service ID of the PSR-3 logger used to log messages coming from the SDK client. Be aware that setting the same logger of the application may create a circular loop when an event fails to be sent.')
+                    ->defaultNull()
+                ->end()
+                ->arrayNode('options')
+                    ->addDefaultsIfNotSet()
+                    ->fixXmlConfig('integration')
+                    ->fixXmlConfig('trace_propagation_target')
+                    ->fixXmlConfig('tag')
+                    ->fixXmlConfig('class_serializer')
+                    ->fixXmlConfig('ignore_exception')
+                    ->fixXmlConfig('ignore_transaction')
+                    ->fixXmlConfig('prefix', 'prefixes')
+                    ->children()
+                        ->arrayNode('integrations')
+                            ->scalarPrototype()->end()
+                        ->end()
+                        ->booleanNode('default_integrations')->end()
+                        ->arrayNode('prefixes')
+                            ->defaultValue(array_merge(['%kernel.project_dir%'], array_filter(explode(\PATH_SEPARATOR, get_include_path() ?: ''))))
+                            ->scalarPrototype()->end()
+                        ->end()
+                        ->floatNode('sample_rate')
+                            ->min(0.0)
+                            ->max(1.0)
+                            ->info('The sampling factor to apply to events. A value of 0 will deny sending any event, and a value of 1 will send all events.')
+                        ->end()
+                        ->booleanNode('enable_tracing')->end()
+                        ->floatNode('traces_sample_rate')
+                            ->min(0.0)
+                            ->max(1.0)
+                            ->info('The sampling factor to apply to transactions. A value of 0 will deny sending any transaction, and a value of 1 will send all transactions.')
+                        ->end()
+                        ->scalarNode('traces_sampler')->end()
+                        ->floatNode('profiles_sample_rate')
+                            ->min(0.0)
+                            ->max(1.0)
+                            ->info('The sampling factor to apply to profiles. A value of 0 will deny sending any profiles, and a value of 1 will send all profiles. Profiles are sampled in relation to traces_sample_rate')
+                        ->end()
+                        ->booleanNode('attach_stacktrace')->end()
+                        ->booleanNode('attach_metric_code_locations')->end()
+                        ->integerNode('context_lines')->min(0)->end()
+                        ->scalarNode('environment')
+                            ->cannotBeEmpty()
+                            ->defaultValue('%kernel.environment%')
+                        ->end()
+                        ->scalarNode('logger')->end()
+                        ->booleanNode('spotlight')->end()
+                        ->scalarNode('spotlight_url')->end()
+                        ->scalarNode('release')
+                            ->cannotBeEmpty()
+                            ->defaultValue('%env(default::SENTRY_RELEASE)%')
+                        ->end()
+                        ->scalarNode('server_name')->end()
+                        ->arrayNode('ignore_exceptions')
+                            ->scalarPrototype()->end()
+                            ->beforeNormalization()->castToArray()->end()
+                        ->end()
+                        ->arrayNode('ignore_transactions')
+                            ->scalarPrototype()->end()
+                            ->beforeNormalization()->castToArray()->end()
+                        ->end()
+                        ->scalarNode('before_send')->end()
+                        ->scalarNode('before_send_transaction')->end()
+                        ->scalarNode('before_send_check_in')->end()
+                        ->scalarNode('before_send_metrics')->end()
+                        ->variableNode('trace_propagation_targets')->end()
+                        ->arrayNode('tags')
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->scalarPrototype()->end()
+                        ->end()
+                        ->scalarNode('error_types')
+                            ->beforeNormalization()
+                                ->always(\Closure::fromCallable([ErrorTypesParser::class, 'parse']))
+                            ->end()
+                        ->end()
+                        ->integerNode('max_breadcrumbs')
+                            ->min(0)
+                            ->max(Options::DEFAULT_MAX_BREADCRUMBS)
+                        ->end()
+                        ->variableNode('before_breadcrumb')->end()
+                        ->arrayNode('in_app_exclude')
+                            ->scalarPrototype()->end()
+                            ->beforeNormalization()->castToArray()->end()
+                            ->defaultValue($inAppExcludes)
+                        ->end()
+                        ->arrayNode('in_app_include')
+                            ->scalarPrototype()->end()
+                            ->beforeNormalization()->castToArray()->end()
+                        ->end()
+                        ->booleanNode('send_default_pii')->end()
+                        ->integerNode('max_value_length')->min(0)->end()
+                        ->scalarNode('transport')->end()
+                        ->scalarNode('http_client')->end()
+                        ->scalarNode('http_proxy')->end()
+                        ->scalarNode('http_proxy_authentication')->end()
+                        ->floatNode('http_connect_timeout')
+                            ->min(0)
+                            ->info('The maximum number of seconds to wait while trying to connect to a server. It works only when using the default transport.')
+                        ->end()
+                        ->floatNode('http_timeout')
+                            ->min(0)
+                            ->info('The maximum execution time for the request+response as a whole. It works only when using the default transport.')
+                        ->end()
+                        ->booleanNode('http_ssl_verify_peer')->end()
+                        ->booleanNode('http_compression')->end()
+                        ->booleanNode('capture_silenced_errors')->end()
+                        ->enumNode('max_request_body_size')
+                            ->values([
+                                'none',
+                                'small',
+                                'medium',
+                                'always',
+                            ])
+                        ->end()
+                        ->arrayNode('class_serializers')
+                            ->useAttributeAsKey('class')
+                            ->normalizeKeys(false)
+                            ->scalarPrototype()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        $this->addMessengerSection($rootNode);
+        $this->addDistributedTracingSection($rootNode);
+
+        return $treeBuilder;
+    }
+
+    private function addMessengerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('messenger')
+                    ->{interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->booleanNode('capture_soft_fails')->defaultTrue()->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addDistributedTracingSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('tracing')
+                    ->canBeDisabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('dbal')
+                            ->{class_exists(DoctrineBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                            ->fixXmlConfig('connection')
+                            ->children()
+                                ->arrayNode('connections')
+                                    ->scalarPrototype()->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('twig')
+                            ->{class_exists(TwigBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                        ->end()
+                        ->arrayNode('cache')
+                            ->{class_exists(CacheItem::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                        ->end()
+                        ->arrayNode('http_client')
+                            ->{class_exists(HttpClient::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                        ->end()
+                        ->arrayNode('console')
+                            ->addDefaultsIfNotSet()
+                            ->fixXmlConfig('excluded_command')
+                            ->children()
+                                ->arrayNode('excluded_commands')
+                                    ->scalarPrototype()->end()
+                                    ->defaultValue(['messenger:consume'])
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+}

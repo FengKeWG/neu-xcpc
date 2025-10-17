@@ -1,0 +1,127 @@
+nelmio_api_doc:
+    html_config:
+        assets_mode: bundle
+    documentation:
+        servers:
+            - url: ~ # Will be set by App\NelmioApiDocBundle\ExternalDocDescriber
+              description: API used at this contest
+            - url: https://www.domjudge.org/demoweb
+              description: New API in development
+        info:
+            title: DOMjudge
+            description: DOMjudge API v4
+            version: "%domjudge.version%"
+            license:
+                name: GPL2
+                url: https://raw.githubusercontent.com/DOMjudge/domjudge/main/COPYING
+            contact:
+                name: DOMjudge development team (not the administrator of this instance)
+                email: development@domjudge.org
+                url: https://github.com/DOMjudge/domjudge/issues/new/choose
+        security:
+            - basicAuth: []
+        components:
+            securitySchemes:
+                basicAuth:
+                    type: http
+                    scheme: basic
+            parameters:
+                cid:
+                    name: cid
+                    in: path
+                    description: The contest ID
+                    required: true
+                    schema:
+                        type: string
+                    examples:
+                        demo:
+                            value: "demo"
+                            summary: The Demo contest
+                        demoprac:
+                            value: "demoprac"
+                            summary: The Demo practice contest
+                balloonId:
+                    name: balloonId
+                    in: path
+                    description: The balloonId to mark as done.
+                    required: true
+                    schema:
+                        type: integer
+                    examples:
+                        balloon:
+                            value: 1
+                            summary: First balloon of the contest
+                id:
+                    name: id
+                    in: path
+                    description: The ID of the entity
+                    required: true
+                    schema:
+                        type: string
+                    examples:
+                        generic:
+                            value: "1"
+                            summary: Most Entities are integer indexed
+                        participants:
+                            value: "3"
+                            summary: Participants group
+                        award:
+                            value: "winner"
+                            summary: "Default Award entity"
+                        executable:
+                            value: "py3"
+                            summary: "Compile executable for python3"
+                idlist:
+                    name: ids[]
+                    in: query
+                    description: Filter the objects to get on this list of ID's
+                    explode: true
+                    schema:
+                        type: array
+                        items:
+                            type: string
+                            description: A single ID
+                strict:
+                    name: strict
+                    in: query
+                    description: Whether to only include CCS compliant properties in the response
+                    schema:
+                        type: boolean
+                        default: false
+            responses:
+                NotFound:
+                    description: The specified resource was not found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                Unauthenticated:
+                    description: Unauthenticated, authentication is missing
+                Unauthorized:
+                    description: Unauthorized, user needs an additional role
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                InvalidResponse:
+                    description: The specified resource identifier is malformed
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - type: object
+                                    - type: string
+                        text/html:
+                            schema:
+                                type: string
+                PostAccountResponse:
+                    description: Returns a (currently meaningless) status message.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                        text/html:
+                            schema:
+                                type: string
+    areas:
+        path_patterns: [ ^/api/v4 ]

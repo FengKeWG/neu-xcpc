@@ -1,0 +1,25 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.select2_extrahead() }}
+{% endblock %}
+
+{% block title %}Creating rejudging - {{ parent() }}{% endblock %}
+
+{% block content %}
+
+    <h1>Creating rejudging...</h1>
+
+    <div class="row">
+        <div class="col-lg-12">
+            {{ macros.progress_bar('Creating rejudging. This might take a while...') }}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extrafooter %}
+    {{ macros.progress_loader(url, data) }}
+{% endblock %}

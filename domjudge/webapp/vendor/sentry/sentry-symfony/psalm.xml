@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="4"
+    memoizeMethodCallResults="true"
+    errorBaseline="psalm-baseline.xml"
+    findUnusedBaselineEntry="false"
+    findUnusedCode="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src" />
+        <ignoreFiles>
+            <file name="src/Tracing/Doctrine/DBAL/TracingDriverConnectionFactoryForV2V3.php" />
+            <file name="src/Tracing/Doctrine/DBAL/TracingServerInfoAwareDriverConnection.php" />
+            <file name="src/Tracing/Doctrine/DBAL/TracingDriverConnectionForV2V3.php" />
+            <file name="src/Tracing/Doctrine/DBAL/TracingDriverForV2.php" />
+            <file name="src/Tracing/Doctrine/DBAL/TracingDriverForV3.php" />
+            <file name="src/Tracing/Doctrine/DBAL/TracingStatementForV2.php" />
+            <file name="src/Tracing/Doctrine/DBAL/TracingStatementForV3.php" />
+            <file name="src/Tracing/HttpClient/TraceableHttpClientForV4.php" />
+            <file name="src/Tracing/HttpClient/TraceableHttpClientForV5.php" />
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <stubs>
+        <file name="tests/Stubs/Profile.phpstub"/>
+    </stubs>
+</psalm>

@@ -1,0 +1,137 @@
+{% extends "jury/base.html.twig" %}
+
+{% block title %}Import and export - {{ parent() }}{% endblock %}
+
+{% block content %}
+
+    <h1>Import and export</h1>
+
+    <div class="importexport">
+    <h2 id="problemarchive">Problems</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tile">
+                <h3>Import archive</h3>
+                {{ form(problem_form) }}
+            </div>
+        </div>
+    </div>
+
+    <h2 id="contests">Contests</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tile">
+                <h3>Import JSON / YAML</h3>
+                {{ form(contest_import_form) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="tile">
+                <h3>Export YAML</h3>
+                {{ form(contest_export_form) }}
+            </div>
+        </div>
+    </div>
+
+    <h2 id="problems">Problems</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tile">
+                <h3>Import JSON / YAML</h3>
+                {{ form(problems_import_form) }}
+            </div>
+        </div>
+    </div>
+
+
+    <h2 id="teams">Teams &amp; groups</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tile">
+            <h3>Import tab-separated</h3>
+                {{ form(tsv_form) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="tile">
+                <h3>Export tab-separated</h3>
+                <ul>
+                {% for type in ['groups', 'teams'] %}
+                    <li>
+                        <a href="{{ path('jury_tsv_export', {'type': type}) }}"><code>{{ type }}.tsv</code></a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tile">
+            <h3>Import JSON / YAML</h3>
+                {{ form(json_form) }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tile">
+            <h3>Import teams from ICPC CMS</h3>
+                {{ form_start(icpccms_form) }}
+                {{ form_row(icpccms_form.contest_id) }}
+                {{ form_row(icpccms_form.access_token) }}
+                {{ form_widget(icpccms_form.fetch_teams) }}
+                {{ form_end(icpccms_form) }}
+            </div>
+        </div>
+    </div>
+
+    <h2 id="results">Results</h2>
+    <div class="row">
+        <div class="col-md-6 offset-md-6">
+            <div class="tile">
+                <h3>Export clarifications</h3>
+                <ul>
+                    <li>
+                        <a href="{{ path('jury_html_export_clarifications') }}" target="_blank">
+                            <code>clarifications.html</code>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 offset-md-6">
+            <div class="tile">
+                <h3>Export results</h3>
+                {{ form(export_results_form) }}
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}
+{% block extrafooter %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            const updateSortOrderCategories = function() {
+                const categories = $('#export_results_sortorder option:selected').data('categories');
+                const $sortOrderHelp = $('#export_results_sortorder_help');
+                const $ul = $('<ul>');
+                categories.forEach(function(category) {
+                    $ul.append($('<li>').text(category));
+                });
+                const $help = $('<div>').append($('<p>').text('This sort order contains the following categories:')).append($ul);
+                $sortOrderHelp.html($help);
+            };
+
+            updateSortOrderCategories();
+
+            $('#export_results_sortorder').on('change', function() {
+                updateSortOrderCategories();
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}Language {{ language.langid }} - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    {{ macros.toggle_extrahead() }}
+    {{ knp_pagination_rel_links(submissions) }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Language {{ language.name }}</h1>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ language.langid }}</td>
+                </tr>
+                <tr>
+                    <th>External ID</th>
+                    <td>{{ language.externalid }}</td>
+                </tr>
+                <tr>
+                    <th>Entry point</th>
+                    <td>
+                        {{ language.requireEntryPoint | printYesNo }}
+                        {% if language.requireEntryPoint and language.entryPointDescription %}
+                            ({{ language.entryPointDescription }})
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Allow submit</th>
+                    <td>
+                        {% include 'jury/partials/language_toggle.html.twig' with {path: 'jury_language_toggle_submit', value: language.allowSubmit} %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Allow judge</th>
+                    <td>
+                        {% include 'jury/partials/language_toggle.html.twig' with {path: 'jury_language_toggle_judge', value: language.allowJudge} %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Time factor</th>
+                    <td>{{ language.timeFactor }} &times;</td>
+                </tr>
+                <tr>
+                    <th>Compile script</th>
+                    <td>
+                        {% if language.compileExecutable %}
+                            <a href="{{ path('jury_executable', {'execId': language.compileExecutable.execid}) }}">{{ language.compileExecutable.execid }}</a>
+                        {% else %}
+                            <span class="nodata">none specified</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Extensions</th>
+                    <td>{{ language.extensions | join(', ') }}</td>
+                </tr>
+                <tr>
+                    <th>Filter files passed to compiler by extension list</th>
+                    <td>
+                        {% include 'jury/partials/language_toggle.html.twig' with {path: 'jury_language_toggle_filter_compiler_files', value: language.filterCompilerFiles} %}
+                    </td>
+                </tr>
+                    <tr>
+                        <th>Compiler version</th>
+                        <td>
+                            {% if language.compilerVersionCommand %}
+                                <pre class="output_text">$ {{ language.compilerVersionCommand }}</pre>
+                            {% else %}
+                                <p class="nodata">No command specified.</p>
+                            {% endif %}
+                            {% if language.compilerVersion %}
+                                <pre class="output_text">{{ language.compilerVersion }}</pre>
+                            {% else %}
+                                <p class="nodata">No canonical version recorded.</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Runner version</th>
+                        <td>
+                            {% if language.runnerVersionCommand %}
+                                <pre class="output_text">$ {{ language.runnerVersionCommand }}</pre>
+                            {% else %}
+                                <p class="nodata">No command specified.</p>
+                            {% endif %}
+                            {% if language.runnerVersion %}
+                                <pre class="output_text">{{ language.runnerVersion }}</pre>
+                            {% else %}
+                                <p class="nodata">No canonical version recorded.</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="button-row">
+        {%- if is_granted('ROLE_ADMIN') -%}
+            {{ button(path('jury_language_edit', {'langId': language.langid}), 'Edit', 'primary', 'edit') }}
+            {{ button(path('jury_language_delete', {'langId': language.langid}), 'Delete', 'danger', 'trash-alt', true) }}
+            {{ button(path('jury_language_request_remaining', {'langId': language.langid}), 'Judge remaining testcases', 'secondary', 'gavel') }}
+        {% endif %}
+        {% include 'jury/partials/rejudge_form.html.twig' with {table: 'language', id: language.langid, buttonClass: 'btn-secondary'} %}
+    </div>
+
+    <h3>Recent submissions</h3>
+
+    <div data-ajax-refresh-target>
+        {%- include 'jury/partials/submission_list.html.twig' with {showTestcases: false} %}
+    </div>
+
+{% endblock %}
+
+{% block extrafooter %}
+    {{ macros.toggle_autosubmit_extrafooter() }}
+{% endblock %}

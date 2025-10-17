@@ -1,0 +1,122 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}Clarifications - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    <style>
+        .data-table td a, .data-table td a:hover {
+            display: inline;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <h1>Clarifications</h1>
+
+    {%- if current_contests is empty %}
+
+        <div class="alert alert-danger">No active contests</div>
+    {%- else %}
+
+        <div class="float-end">
+            <a href="{{ path('jury_html_export_clarifications') }}" target="_blank" class="btn btn-secondary btn-sm">
+                <i class="fas fa-print"></i> Print clarifications
+            </a>
+            <a href="{{ path('jury_clarification_new') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-envelope"></i> Send clarification
+            </a>
+        </div>
+
+        <div class="btn-group btn-group-sm mb-3" role="group">
+            <span class="input-group-text listtoggles">Filter:</span>
+            {% for type in ['all', 'new', 'handled', 'general'] %}
+                <input type="radio" name="filter" autocomplete="off" class="btn-check" value="{{ type }}" id="filter{{ type }}"
+                       {% if type == 'all' and currentFilter == null %}checked{% endif %}
+                       {% if type != 'all' and currentFilter == type %}checked{% endif %}
+                >
+                <label class="btn btn-secondary" for="filter{{ type }}">{{ type | capitalize }}</label>
+            {% endfor %}
+        </div>
+
+        {% if queues | length > 0 %}
+            <div class="btn-group btn-group-sm mb-3" role="group">
+                <span class="input-group-text listtoggles">Queue:</span>
+                <input type="radio" name="queue" autocomplete="off" id="queueall" class="btn-check" value="all"
+                       {% if currentQueue == "all" %}checked{% endif %}>
+                <label class="btn btn-secondary" for="queueall">All</label>
+                <input type="radio" name="queue" autocomplete="off" id="queueunassigned" class="btn-check" value="unassigned"
+                       {% if currentQueue == "unassigned" %}checked{% endif %}>
+                <label class="btn btn-secondary" for="queueunassigned">Unassigned</label>
+                {%- for queue, name in queues %}
+                    <input type="radio" name="queue" autocomplete="off" class="btn-check" id="queue{{ queue }}" value="{{ queue }}"
+                           {% if currentQueue == queue %}checked{% endif %}>
+                    <label class="btn btn-secondary" for="queue{{ queue }}">{{ name }}</label>
+                {%- endfor %}
+            </div>
+        {% endif %}
+
+        {% if currentFilter is null or currentFilter == 'new' %}
+            <h3 id="newrequests">New requests</h3>
+            {%- if newClarifications | length == 0 %}
+                <p class="nodata">No new clarification requests.</p>
+            {%- else %}
+                {%- include 'jury/partials/clarification_list.html.twig' with {clarifications: newClarifications, direction: 'from'} %}
+            {%- endif %}
+        {% endif %}
+
+        {% if currentFilter is null or currentFilter == 'handled' %}
+            <h3 id="oldrequests" class="mt-4">Handled requests</h3>
+            {%- if oldClarifications | length == 0 %}
+                <p class="nodata">No old clarification requests.</p>
+            {%- else %}
+                {%- include 'jury/partials/clarification_list.html.twig' with {clarifications: oldClarifications, direction: 'from'} %}
+            {%- endif %}
+        {% endif %}
+
+        {% if currentFilter is null or currentFilter == 'general' %}
+            <h3 id="clarifications" class="mt-4">General clarifications</h3>
+            {%- if generalClarifications | length == 0 %}
+                <p class="nodata">No general clarifications.</p>
+            {%- else %}
+                {%- include 'jury/partials/clarification_list.html.twig' with {clarifications: generalClarifications, direction: 'to'} %}
+            {%- endif %}
+        {% endif %}
+    {%- endif %}
+
+    <script>
+        function doSwitch() {
+            // Fallback the queue to all, since it might not be defined.
+            window.location = '{{ path('jury_clarifications', {'queue': 'REPLACE_QUEUE', 'filter': 'REPLACE_FILTER'}) }}'
+                .replace('REPLACE_QUEUE', $('input[name=queue]:checked').val() || 'all')
+                .replace('REPLACE_FILTER', $('input[name=filter]:checked').val())
+                .replace('&amp;', '&');
+        }
+        $().ready(function () {
+            $('.qbut').on('change', function () {
+                var icon = $("#qig" + $(this).attr('data-clarid') );
+                icon.html('<i class="fas fa-spinner fa-spin"></i>');
+                var parenttd = $(this).closest('td');
+                var parenttr = $(this).closest('tr');
+                var newname = $(this).closest('label').text().trim();
+                $.post("{{ path('jury_clarification_change_queue', {'clarId': 12345}) }}".replace('12345', $(this).attr('data-clarid')),
+                    {'queue': $(this).val()})
+                    .done(function( data ) {
+                        if ( data ) {
+                            parenttd.attr('data-search', newname);
+                            icon.html('<i class="fas fa-check"></i>');
+                        } else {
+                            icon.html('<i class="fas fa-times"></i>');
+                        }
+                    });
+            });
+
+            $('input[name=queue]').on('change', doSwitch);
+            $('input[name=filter]').on('change', doSwitch);
+        });
+    </script>
+
+{% endblock %}

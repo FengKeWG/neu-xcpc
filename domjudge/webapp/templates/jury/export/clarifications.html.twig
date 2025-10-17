@@ -1,0 +1,122 @@
+{% extends 'jury/export/layout.html.twig' %}
+
+{% block body %}
+    <style>
+        h2 {
+            padding-top: 0;
+        }
+
+        td:first-child {
+            padding-right: 10px;
+        }
+
+        tr.top-line {
+            border-top: 4px solid #ccc;
+        }
+
+        tr.top-line td {
+            padding-top: 8px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* CSS from Bootstrap for the team id badge. */
+        .badge {
+            display: inline-block;
+            padding: .25em .4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: .25rem;
+        }
+        .bg-secondary {
+            color: #fff;
+            background-color: #6c757d;
+        }
+    </style>
+
+    {% for queue, clarifications in grouped %}
+        {% if not loop.first %}
+            <div class="page-break"></div>
+            <h1>{{ title }}</h1>
+        {% endif %}
+        <h2>{{ queues[queue] }}</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Contest time</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">Subject</th>
+                <th scope="col">Answered?</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for clarification in clarifications %}
+                <tr class="top-line">
+                    <td>{{ clarification.clarId }}</td>
+                    <td>{{ clarification.submitTime | printtime(null, contest) }}</td>
+                    <td>
+                        {% if clarification.sender %}
+                            {{ clarification.sender.effectiveName }} {{ clarification.sender | entityIdBadge('t') }}
+                        {% else %}
+                            Jury ({{ clarification.juryMember }})
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if clarification.recipient and clarification.sender is empty %}
+                            {{ clarification.recipient.effectiveName }} {{ clarification.recipient | entityIdBadge('t') }}
+                        {% elseif clarification.sender %}
+                            Jury
+                        {% else %}
+                            All
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if clarification.problem %}
+                            {{ problems[clarification.problem.probid].shortName }}: {{ clarification.problem.name }}
+                        {% elseif clarification.category and categories[clarification.category] is defined %}
+                            {{ categories[clarification.category] }}
+                        {% else %}
+                            General
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ clarification.answered | printYesNo }}
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Content</b></td>
+                    <td colspan="5">
+                        <div class="card-text">{{ clarification.body | markdown_to_html | sanitize_html('app.clarification_sanitizer') }}</div>
+                    </td>
+                </tr>
+                {% if clarification.replies is not empty %}
+                    {% for idx, reply in clarification.replies %}
+                        <tr>
+                            <td>
+                                <b>
+                                    {% if clarification.replies.count > 1 %}
+                                        Reply #{{ idx + 1 }}
+                                    {% else %}
+                                        Reply
+                                    {% endif %}
+                                </b>
+                            </td>
+                            <td colspan="5">
+                                <div class="card-text">{{ reply.body | markdown_to_html | sanitize_html('app.clarification_sanitizer') }}</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endblock %}

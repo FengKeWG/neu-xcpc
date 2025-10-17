@@ -1,0 +1,13 @@
+services:
+  mariadb:
+    image: dockerproxy.com/library/mariadb:latest
+
+  domjudge:
+    image: dockerproxy.com/domjudge/domjudge-contributor:latest
+    volumes:
+      - /mnt/data/domjudge:/opt/domjudge
+      - /sys/fs/cgroup:/sys/fs/cgroup
+      - /chroot
+    working_dir: /opt/domjudge
+    environment:
+      - PROJECT_DIR=/opt/domjudge

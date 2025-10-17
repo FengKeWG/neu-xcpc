@@ -1,0 +1,95 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ title | default('DOMjudge') }}{% endblock %}
+
+{% block messages %}
+    {{ parent() }}
+
+    {% if app.session.flashBag.has('scoreboard_refresh') %}
+        {% for message in app.session.flashBag.get('scoreboard_refresh') %}
+            {% include 'jury/refresh_scoreboard.html.twig' %}
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('style_jury.css') }}">
+{% endblock %}
+
+{% block menu %}
+    {% include 'jury/menu.html.twig' %}
+{% endblock %}
+{% block footer %}
+    <script src="{{ asset('js/monaco/vs/loader.js') }}"></script>
+    <script>
+        {# A bit ugly to do the replace, but Symfony adds a version to any asset URLs so remove it again #}
+        require.config({ paths: { vs: '{{ asset('js/monaco/vs') }}'.replace(/\?.*/, '') } });
+        window.editorThemeFolder = '{{ asset('js/monaco/themes') }}'.replace(/\?.*/, '');
+    </script>
+    <script>
+        $(function () {
+            /* Show the notification options if the browser supports it */
+            if ('Notification' in window) {
+                $('#notify_disable').click(disableNotifications);
+                $('#notify_enable').click(enableNotifications);
+                if (getCookie('domjudge_notify') != 1) {
+                    $('#notify_enable').removeClass('d-none');
+                } else {
+                    $('#notify_disable').removeClass('d-none');
+                }
+            }
+
+            $('#keys_disable').click(disableKeys);
+            $('#keys_enable').click(enableKeys);
+            var keysCookie = getCookie('domjudge_keys');
+            if (keysCookie != 1 && keysCookie != "") {
+                $('#keys_enable').removeClass('d-none');
+            } else {
+                $('#keys_disable').removeClass('d-none');
+            }
+
+            updateMenuAlerts();
+            setInterval(updateMenuAlerts, 20000);
+
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            applyEditorTheme();
+        });
+
+        initializeKeyboardShortcuts();
+    </script>
+
+    <div class="container d-none" id="keyhelp">
+        <h1>Keyboard shortcuts</h1>
+
+        <code>?</code> display this help, <code>Escape</code> to exit <br/>
+        <br/>
+
+        <code>j</code> go to the next item, e.g. next submission <br/>
+        <code>k</code> go to the previous item, e.g. previous submission <br/>
+        <br/>
+
+        <code>s</code> <code>↵</code> open the list of submissions <br/>
+        <code>s</code> <code>[0-9]+</code> <code>↵</code> open a specific submission, e.g. <code>s42↵</code> to go to submission 42 <br/>
+        <br/>
+
+        <code>t</code> <code>↵</code> open the list of teams <br/>
+        <code>t</code> <code>[0-9]+</code> <code>↵</code> open to a specific team <br/>
+        <br/>
+
+        <code>p</code> <code>↵</code> open the list of problems <br/>
+        <code>p</code> <code>[0-9]+</code> <code>↵</code> open a specific problem <br/>
+        <br/>
+
+        <code>c</code> <code>↵</code> open the list of clarifications <br/>
+        <code>c</code> <code>[0-9]+</code> <code>↵</code> open a specific clarification <br/>
+        <br/>
+
+        <code>Shift + j</code> <code>[0-9]+</code> <code>↵</code> open a specific judging <br/>
+        <br/>
+
+        <code>Shift + s</code> open the scoreboard<br/>
+        <br/>
+    </div>
+{% endblock %}

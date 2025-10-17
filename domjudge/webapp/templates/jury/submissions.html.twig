@@ -1,0 +1,99 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}Submissions {{ current_contest.shortname | default ('') }} - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    {{ macros.select2_extrahead() }}
+    {{ knp_pagination_rel_links(submissions) }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Submissions</h1>
+
+    <div class="btn-group btn-group-sm mb-3" role="group">
+        <span class="input-group-text listtoggles">Show:</span>
+        {%- for idx, type in viewTypes %}
+            <input type="radio" autocomplete="off" class="btn-check"
+                name="viewtype" id="viewtype{{ idx }}" value="{{ type }}"
+                {% if idx == view %}checked{% endif %}>
+            <label class="btn btn-secondary" for="viewtype{{ idx }}">{{ type }}</label>
+        {%- endfor %}
+    </div>
+
+    <div class="mb-3">
+        <div class="btn-group" role="group">
+            <input type="checkbox" class="btn-check" id="filter-toggle" {% if hasFilters %}checked{% endif %} autocomplete="off">
+            <label for="filter-toggle" class="btn btn-outline-secondary">
+                <i class="fas fa-filter"></i> Filter
+            </label>
+        </div>
+        <div class="card mt-3{% if not hasFilters %} d-none{% endif %}" id="filter-card">
+            <div class="card-body col-sm-6">
+                {{ form_start(form) }}
+                {{ form_row(form.problem_id) }}
+                {{ form_row(form.language_id) }}
+                {{ form_row(form.category_id) }}
+                {{ form_row(form.affiliation_id) }}
+                {{ form_row(form.team_id) }}
+                {{ form_row(form.result) }}
+                <div class="mb-3">
+                    {{ form_widget(form.apply) }}
+                    {{ form_widget(form.clear) }}
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+
+    {% if disabledLangs %}
+        <div class="alert alert-danger">
+            The following languages are currently not allowed to be judged:
+            <ul>
+                {% for id, name in disabledLangs %}
+                    <li>{{ name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if disabledProbs %}
+        <div class="alert alert-danger">
+            The following problems are currently not allowed to be judged:
+            <ul>
+                {% for id, name in disabledProbs %}
+                    <li>{{ name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div data-ajax-refresh-target>
+        {%- include 'jury/partials/submission_list.html.twig' %}
+    </div>
+
+{% endblock %}
+
+{% block extrafooter %}
+    <script>
+        $(function () {
+            $('input[name=viewtype]').on('change', function () {
+                window.location = '{{ path('jury_submissions', {'view': 'REPLACE_ME'}) }}'.replace('REPLACE_ME', $(this).val());
+            });
+
+            $('#filter-toggle').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('#filter-card').removeClass('d-none');
+                } else {
+                    $('#filter-card').addClass('d-none');
+                }
+            });
+
+            $('#submissions_filter_clear').on('click', function () {
+                $('select[data-filter-field]').val([]).trigger('change');
+            });
+        });
+    </script>
+{% endblock %}

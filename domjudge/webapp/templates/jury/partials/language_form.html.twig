@@ -1,0 +1,51 @@
+<div class="row">
+    <div class="col-lg-4">
+        {{ form(form) }}
+    </div>
+</div>
+
+<script>
+    var $extensionsHolder;
+    var $addExtensionButton = $('<button type="button" class="btn btn-secondary"><i class="fas fa-plus"></i></button>');
+
+    $(function () {
+        $extensionsHolder = $('div#language_extensions');
+        $extensionsHolder.append($addExtensionButton);
+
+        $extensionsHolder.data('index', $extensionsHolder.find(':input').length);
+
+        $addExtensionButton.on('click', function (e) {
+            addExtension($extensionsHolder, $addExtensionButton);
+        });
+
+        $extensionsHolder.find('div:not(.invalid-feedback)').each(function() {
+            addDeleteLink($(this));
+        });
+
+        function addExtension($extensionsHolder, $addExtensionButton) {
+            var prototype = $extensionsHolder.data('prototype');
+            var index = $extensionsHolder.data('index');
+            var newForm = prototype;
+            newForm = newForm.replace(/__name__/g, index);
+            $extensionsHolder.data('index', index + 1);
+            var $newForm = $(newForm);
+            $addExtensionButton.before($newForm);
+            addDeleteLink($newForm);
+        }
+
+        function addDeleteLink($extensionDiv) {
+            var $removeFormButton = $('<button type="button" class="btn btn-danger"><i class="fas fa-trash"></i></button>');
+            var $inputGroup = $('<div class="input-group"></div>');
+            var $formControl = $extensionDiv.find('.form-control');
+            var $feedbackBlock = $extensionDiv.find('.invalid-feedback');
+            $inputGroup.append($formControl);
+            $inputGroup.append($removeFormButton);
+            $inputGroup.append($feedbackBlock);
+            $extensionDiv.html($inputGroup);
+
+            $removeFormButton.on('click', function(e) {
+                $extensionDiv.remove();
+            });
+        }
+    });
+</script>

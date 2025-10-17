@@ -1,0 +1,197 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}Team {{ team.teamid }} - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    {{ knp_pagination_rel_links(submissions) }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Team {{ team.effectiveName }}</h1>
+
+    <div class="row">
+        <div class="col">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ team.teamid }}</td>
+                </tr>
+                <tr>
+                    <th>External ID</th>
+                    <td>{{ team.externalid }}</td>
+                </tr>
+                <tr>
+                    <th>ICPC ID</th>
+                    <td>
+                        {% if team.icpcid %}
+                            {{ team.icpcid }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Label</th>
+                    <td>
+                        {% if team.label | length %}
+                            {{ team.label }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td>{{ team.name }}</td>
+                </tr>
+                <tr>
+                    <th>Display name</th>
+                    <td>
+                        {% if team.displayName %}
+                            {{ team.displayName }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>First login</th>
+                    <td>
+                        {% if team.users is not empty and team.users.first.firstLogin %}
+                            {{ team.users.first.firstLogin | printtime('D d M Y H:i:s T') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>IP</th>
+                    <td>
+                        {% if team.users is not empty and team.users.first.lastIpAddress %}
+                            {{ team.users.first.lastIpAddress | printHost(true) }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if team.penalty %}
+                    <tr>
+                        <th>Penalty time</th>
+                        <td>{{ team.penalty }}</td>
+                    </tr>
+                {% endif %}
+                {% if team.location %}
+                    <tr>
+                        <th>Location</th>
+                        <td>{{ team.location }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <th>User</th>
+                    <td>
+                        {% for user in team.users %}
+                            <a href="{{ path('jury_user', {'userId': user.userid}) }}">{{ user.username }}</a>
+                        {% else %}
+                            {%- if is_granted('ROLE_ADMIN') -%}
+                                <a href="{{ path('jury_user_add', {'team': team.teamid}) }}">
+                                    <i class="fas fa-user-plus"></i> add user
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>Category</th>
+                    <td>
+                        {% if team.category %}
+                            <a href="{{ path('jury_team_category', {'categoryId': team.category.categoryid}) }}">
+                                {{ team.category.name }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if showAffiliations and team.affiliation %}
+                    <tr>
+                        <th>Affiliation</th>
+                        <td>
+                            {% set affiliationId = team.affiliation.externalid %}
+                            {% set affiliationLogo = affiliationId | assetPath('affilation') %}
+                            {% if affiliationLogo %}
+                                <img src="{{ asset(affiliationLogo) }}" alt="{{ team.affiliation.shortname }}"
+                                     title="{{ team.affiliation.shortname }}" class="affiliation-logo"/>
+                            {% endif %}
+                            <a href="{{ path('jury_team_affiliation', {'affilId': team.affiliation.affilid}) }}">
+                                {{ team.affiliation.name }}
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if showFlags and team.affiliation and team.affiliation.country %}
+                    <tr>
+                        <th>Country</th>
+                        <td>
+                            {{ team.affiliation.country | countryFlag(true) }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if team.contests|length > 0 %}
+                <tr>
+                    <th>Contests</th>
+                    <td>
+                        {% for ucontest in team.contests %}
+                            <a href="{{ path('jury_contest', {'contestId': ucontest.cid}) }}">{{ ucontest.shortname }}</a>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% if team.internalcomments is not empty %}
+                <tr>
+                    <th>Internal comments (Jury only)</th>
+                    <td>
+                        {{ team.internalcomments | nl2br }}
+                    </td>
+                </tr>
+                {% endif %}
+                {% if team.publicdescription is not empty %}
+                    <tr>
+                        <th>Description (Public)</th>
+                        <td>{{ team.publicdescription | nl2br }}</td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+    {% set teamId = team.externalid %}
+    {% set teamImage = teamId | assetPath('team') %}
+    {% if teamImage %}
+        <div class="col">
+        <img loading="lazy" class="teampicture" src="{{ asset(teamImage) }}" alt="Picture of team {{ team.name }}"
+             title="Picture of team {{ team.effectiveName }}">
+        </div>
+    {% endif %}
+    </div>
+
+    <div class="button-row">
+        {%- if is_granted('ROLE_ADMIN') -%}
+            {{ button(path('jury_team_edit', {'teamId': team.teamid}), 'Edit', 'primary', 'edit') }}
+            {{ button(path('jury_team_delete', {'teamId': team.teamid}), 'Delete', 'danger', 'trash-alt', true) }}
+        {% endif %}
+        {{ button(path('jury_clarification_new', {'teamto': team.teamid}), 'Send message', 'secondary', 'envelope') }}
+        {% include 'jury/partials/rejudge_form.html.twig' with {table: 'team', id: team.teamid, buttonClass: 'btn-secondary'} %}
+    </div>
+
+    <div data-ajax-refresh-target>
+        {% include 'jury/partials/team_score_and_submissions.html.twig' %}
+    </div>
+
+{% endblock %}

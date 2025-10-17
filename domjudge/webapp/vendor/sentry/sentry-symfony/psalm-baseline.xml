@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="5.22.2@d768d914152dbbf3486c36398802f74e80cfde48">
+  <file src="src/DependencyInjection/SentryExtension.php">
+    <UndefinedClass>
+      <code><![CDATA[FatalErrorException]]></code>
+    </UndefinedClass>
+  </file>
+  <file src="src/EventListener/ConsoleCommandListener.php">
+    <InvalidExtendClass>
+      <code><![CDATA[ConsoleListener]]></code>
+    </InvalidExtendClass>
+    <MethodSignatureMismatch>
+      <code><![CDATA[public function __construct(HubInterface $hub, bool $captureErrors = true)]]></code>
+    </MethodSignatureMismatch>
+  </file>
+  <file src="src/EventListener/KernelEventForwardCompatibilityTrait.php">
+    <UndefinedMethod>
+      <code><![CDATA[isMasterRequest]]></code>
+    </UndefinedMethod>
+  </file>
+  <file src="src/Tracing/Cache/TraceableCacheAdapterTrait.php">
+    <LessSpecificImplementedReturnType>
+      <code><![CDATA[iterable]]></code>
+    </LessSpecificImplementedReturnType>
+  </file>
+  <file src="src/Tracing/Doctrine/DBAL/Compatibility/MiddlewareInterface.php">
+    <UnrecognizedStatement>
+      <code><![CDATA[interface MiddlewareInterface extends DoctrineMiddlewareInterface
+    {
+    }]]></code>
+    </UnrecognizedStatement>
+  </file>
+  <file src="src/Tracing/Doctrine/DBAL/TracingDriverForV4.php">
+    <MoreSpecificImplementedParamType>
+      <code><![CDATA[$params]]></code>
+    </MoreSpecificImplementedParamType>
+    <TooManyArguments>
+      <code><![CDATA[new StaticServerVersionProvider($connection->getServerVersion())]]></code>
+      <code><![CDATA[parent::__construct($decoratedDriver)]]></code>
+    </TooManyArguments>
+    <UndefinedClass>
+      <code><![CDATA[$this->getDatabasePlatform($versionProvider)]]></code>
+    </UndefinedClass>
+  </file>
+  <file src="src/Tracing/HttpClient/TraceableResponseForV5.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[toStream]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/Tracing/HttpClient/TraceableResponseForV6.php">
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[toStream]]></code>
+    </UndefinedInterfaceMethod>
+  </file>
+  <file src="src/aliases.php">
+    <MissingDependency>
+      <code><![CDATA[TracingDriverForV2]]></code>
+    </MissingDependency>
+  </file>
+</files>

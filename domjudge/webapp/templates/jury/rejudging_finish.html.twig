@@ -1,0 +1,28 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}{{ action | capitalize }} rejudging r{{ rejudging.rejudgingid }} - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    {{ macros.select2_extrahead() }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>{{ action | capitalize }} rejudging
+        <a href="{{ path('jury_rejudging', {'rejudgingId': rejudging.rejudgingid}) }}">r{{ rejudging.rejudgingid }}</a>
+    </h1>
+
+    {% if action == 'apply' %}
+        {% set progressBarMessage = 'Applying rejudge may take some time, please be patient.' %}
+    {% else %}
+        {% set progressBarMessage = '' %}
+    {% endif %}
+    {{ macros.progress_bar(progressBarMessage) }}
+{% endblock %}
+
+{% block extrafooter %}
+    {{ macros.progress_loader(path('jury_rejudging_finish', {rejudgingId: rejudging.rejudgingid, action: action})) }}
+{% endblock %}

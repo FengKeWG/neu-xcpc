@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- DOMjudge version {{ DOMJUDGE_VERSION }} -->
+    <meta charset="{{ DJ_CHARACTER_SET }}">
+    <title>{% block title %}DOMjudge{% endblock %}</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="{{ asset("css/bootstrap.min.css") }}">
+    <link rel="stylesheet" href="{{ asset("css/fontawesome-all.min.css") }}">
+    <link rel="stylesheet" href="{{ path('scoreboard_category_color_css') }}">
+    <script src="{{ asset("js/jquery.min.js") }}"></script>
+    <script src="{{ asset("js/jquery.debounce.min.js") }}"></script>
+    <script src="{{ asset("js/bootstrap.bundle.min.js") }}"></script>
+
+    <script src="{{ asset("js/domjudge.js") }}"></script>
+    {% for file in customAssetFiles('js') %}
+        <script src="{{ asset('js/custom/' ~ file) }}"></script>
+    {% endfor %}
+    {% block extrahead %}
+        <link rel="stylesheet" href="{{ asset('style_domjudge.css') }}">
+
+        {{ extrahead | default('') }}
+    {% endblock %}
+    {% for file in customAssetFiles('css') %}
+        <link rel="stylesheet" href="{{ asset('css/custom/' ~ file) }}">
+    {% endfor %}
+</head>
+<body{% if static is defined and static %} class="static"{% endif %}>
+{% block menu %}{% endblock %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                {% block messages %}
+                    {% include 'partials/messages.html.twig' %}
+                {% endblock %}
+                {% block content %}{{ body | raw }}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<script>
+    {% if app.request %}
+        var domjudge_base_url = "{{ app.request.getBaseURL() }}";
+    {% endif %}
+    var markdownPreviewUrl = "{{ path('markdown_preview') }}";
+    $(function () {
+        /* toggle refresh if set */
+        {% if refresh is defined and refresh %}
+        $('#refresh-navitem').on('click', function () {
+            toggleRefresh('{{ refresh.url | raw }}', {{ refresh.after }}, {{ refresh.ajax | default(0) }});
+        });
+        {% endif %}
+        /* Enable page refresh if set if wanted by the page, and wanted by the user */
+        {% if refresh is defined and refresh and refresh_flag %}
+        enableRefresh('{{ refresh.url | raw }}', {{ refresh.after }}, {{ refresh.ajax | default(0) }});
+        {% endif %}
+
+        initializeAjaxModals();
+    });
+</script>
+{% block footer %}{% endblock %}
+{% block extrafooter %}{% endblock %}
+</body>
+</html>

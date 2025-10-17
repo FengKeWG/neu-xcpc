@@ -1,0 +1,86 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Sentry\SentryBundle\DependencyInjection\Compiler;
+
+use Doctrine\DBAL\Result;
+use Sentry\SentryBundle\Tracing\Doctrine\DBAL\ConnectionConfigurator;
+use Sentry\SentryBundle\Tracing\Doctrine\DBAL\TracingDriverMiddleware;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+
+final class DbalTracingPass implements CompilerPassInterface
+{
+    /**
+     * This is the format used by the DoctrineBundle bundle to register the
+     * services for each connection.
+     */
+    private const CONNECTION_SERVICE_NAME_FORMAT = 'doctrine.dbal.%s_connection';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContainerBuilder $container): void
+    {
+        if (
+            !$container->hasParameter('doctrine.connections')
+            || !$container->getParameter('sentry.tracing.enabled')
+            || !$container->getParameter('sentry.tracing.dbal.enabled')
+        ) {
+            return;
+        }
+
+        $this->assertRequiredDbalVersion();
+
+        /** @var string[] $connectionsToTrace */
+        $connectionsToTrace = $container->getParameter('sentry.tracing.dbal.connections');
+
+        /** @var array<string, string> $connections */
+        $connections = $container->getParameter('doctrine.connections');
+
+        if (empty($connectionsToTrace)) {
+            $connectionsToTrace = array_keys($connections);
+        }
+
+        foreach ($connectionsToTrace as $connectionName) {
+            if (!\in_array(\sprintf(self::CONNECTION_SERVICE_NAME_FORMAT, $connectionName), $connections, true)) {
+                throw new \InvalidArgumentException(\sprintf('The Doctrine connection "%s" does not exists and cannot be instrumented.', $connectionName));
+            }
+
+            if (class_exists(Result::class)) {
+                $this->configureConnectionForDoctrineDBALVersion3($container, $connectionName);
+            } else {
+                $this->configureConnectionForDoctrineDBALVersion2($container, $connectionName);
+            }
+        }
+    }
+
+    private function configureConnectionForDoctrineDBALVersion3(ContainerBuilder $container, string $connectionName): void
+    {
+        $tracingMiddlewareDefinition = $container->getDefinition(TracingDriverMiddleware::class);
+        $tracingMiddlewareDefinition->addTag('doctrine.middleware', ['connection' => $connectionName]);
+    }
+
+    private function configureConnectionForDoctrineDBALVersion2(ContainerBuilder $container, string $connectionName): void
+    {
+        $connectionDefinition = $container->getDefinition(\sprintf(self::CONNECTION_SERVICE_NAME_FORMAT, $connectionName));
+        $connectionDefinition->setConfigurator([new Reference(ConnectionConfigurator::class), 'configure']);
+    }
+
+    private function assertRequiredDbalVersion(): void
+    {
+        if (interface_exists(Result::class)) {
+            // DBAL ^2.13
+            return;
+        }
+
+        if (class_exists(Result::class)) {
+            // DBAL ^3
+            return;
+        }
+
+        throw new \LogicException('Tracing support cannot be enabled as the Doctrine DBAL 2.13+ package is not installed. Try running "composer require doctrine/dbal:^2.13".');
+    }
+}

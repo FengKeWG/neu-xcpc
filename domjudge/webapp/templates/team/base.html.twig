@@ -1,0 +1,51 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ title|default('DOMjudge') }}{% endblock %}
+
+{% block menu %}
+    {% include 'team/menu.html.twig' %}
+{% endblock %}
+
+{% block footer %}
+    {% include 'team/partials/submit_scripts.html.twig' %}
+
+    <script>
+        $(function () {
+            var $body = $('body');
+            $body.on('submit', 'form[name=team_clarification]', function () {
+                return confirm("Send clarification request to Jury?");
+            });
+
+            window.replaceClarificationReplyButton = function() {
+                var $replyButton = $('#clarification-reply-button');
+                var $submitButton = $('<button type="submit" name="submit" class="btn btn-primary"><i class="fas fa-envelope"></i> Send</button>');
+                $replyButton.replaceWith($submitButton);
+
+                $submitButton.on('click', function() {
+                    var $form = $('form[name="team_clarification"]');
+                    if ($form[0].reportValidity()) {
+                        $form.submit();
+                    }
+                });
+            }
+
+            $body.on('click', '#clarification-reply-button', function() {
+                replaceClarificationReplyButton();
+            });
+
+            /* Show the notification options if the browser supports it */
+            if ('Notification' in window) {
+                $('#notify_disable').click(disableNotifications);
+                $('#notify_enable').click(enableNotifications);
+                if (getCookie('domjudge_notify') != 1) {
+                    $('#notify_enable').removeClass('d-none');
+                } else {
+                    $('#notify_disable').removeClass('d-none');
+                }
+            }
+            updateClarifications();
+            setInterval(updateClarifications, 20000);
+        });
+
+    </script>
+{% endblock %}

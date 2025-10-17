@@ -1,0 +1,71 @@
+{% extends "public/base.html.twig" %}
+
+{% block title %}Scoreboard {{ contest.shortname | default('') }} - {{ parent() }}{% endblock %}
+{% block content %}
+    {% if contest is defined %}
+        {% set contestId = contest.externalid %}
+        {% if contestId %}
+            {% set bannerImage = contestId | assetPath('contest') %}
+        {% endif %}
+    {% endif %}
+    {% if bannerImage is not defined or not bannerImage %}
+        {% set bannerImage = globalBannerAssetPath() %}
+    {% endif %}
+    {% if bannerImage %}
+        <img class="banner mt-2" src="{{ asset(bannerImage) }}" alt="Banner">
+    {% endif %}
+
+    <div data-ajax-refresh-target data-ajax-refresh-after="initializeScoreboard" class="mt-3">
+        {% include 'partials/scoreboard.html.twig' with {jury: false, public: true} %}
+    </div>
+
+    <div data-submissions-modal>
+        {% include 'public/team_submissions_modal.html.twig' %}
+    </div>
+    {% include 'public/partials/submission_list_template.html.twig' %}
+{% endblock %}
+
+{% block extrafooter %}
+    <script>
+        initFavouriteTeams();
+        pinScoreheader();
+        initScoreboardSubmissions();
+
+        {% if static and refresh is defined %}
+        function disableRefreshOnModal() {
+            $('.modal')
+                .on('show.bs.modal', function () {
+                    disableRefresh({{ refresh.ajax | default(0) }});
+                })
+                .on('hidden.bs.modal', function () {
+                    enableRefresh('{{ refresh.url | raw }}', {{ refresh.after }}, {{ refresh.ajax | default(0) }});
+                });
+        }
+        {% endif %}
+
+        var scoreboardUrl = '{{ refresh.url ?? null }}';
+
+        $(function () {
+            window.initializeScoreboard = function () {
+                var $newProgress = $('[data-ajax-refresh-target] > .d-none > [data-progress-bar]');
+                if ($newProgress.length) {
+                    var $oldProgress = $('body > [data-progress-bar]');
+                    $oldProgress.html($newProgress.children());
+                    $newProgress.parent().remove();
+                }
+
+                initFavouriteTeams();
+                pinScoreheader();
+                {% if static and refresh is defined %}
+                disableRefreshOnModal();
+                {% endif %}
+                resizeMobileTeamNamesAndProblemBadges();
+                initScoreboardSubmissions();
+            };
+
+            {% if static and refresh is defined %}
+            disableRefreshOnModal();
+            {% endif %}
+        });
+    </script>
+{% endblock %}

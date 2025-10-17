@@ -1,0 +1,85 @@
+# To get started with security, check out the documentation:
+# https://symfony.com/doc/current/security.html
+security:
+    role_hierarchy:
+        ROLE_JURY: [ROLE_CLARIFICATION_RW, ROLE_API, ROLE_API_READER, ROLE_API_SOURCE_READER]
+        ROLE_ADMIN: [ROLE_JURY, ROLE_JUDGEHOST, ROLE_API_WRITER]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+
+
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        App\Entity\User:
+            algorithm: 'bcrypt'
+            cost: 7
+    providers:
+        domjudge_db_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+
+
+    firewalls:
+        # NOTE: If you change anything in this section, or move the authenticators around
+        # NOTE: make sure to update the $stateless_fw_contexts variables in each guard authenticator
+        # NOTE: Otherwise they may not be enabled.
+
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # SEE NOTE ABOVE IF CHANGING ANYTHING IN THIS SECTION
+        # API does Basic Auth and IP address auth
+        api:
+            pattern: ^/api
+            context: domjudge
+            provider: domjudge_db_provider
+            user_checker: App\Security\UserChecker
+            entry_point: App\Security\DOMJudgeIPAuthenticator
+            # SEE NOTE ABOVE IF CHANGING ANYTHING HERE
+            custom_authenticators:
+                - App\Security\DOMJudgeIPAuthenticator
+                - App\Security\DOMJudgeBasicAuthenticator
+
+        # Provides prometheus metrics
+        metrics:
+            pattern: ^/prometheus/metrics
+            context: domjudge
+            provider: domjudge_db_provider
+            stateless: true
+            user_checker: App\Security\UserChecker
+            entry_point: App\Security\DOMJudgeIPAuthenticator
+            # SEE NOTE ABOVE IF CHANGING ANYTHING HERE
+            custom_authenticators:
+                - App\Security\DOMJudgeIPAuthenticator
+                - App\Security\DOMJudgeBasicAuthenticator
+
+        # rest of app does form_login
+        main:
+            pattern: ^/
+            context: domjudge
+            provider: domjudge_db_provider
+            user_checker: App\Security\UserChecker
+            entry_point: App\Security\DOMJudgeXHeadersAuthenticator
+            custom_authenticators:
+                - App\Security\DOMJudgeXHeadersAuthenticator
+                - App\Security\DOMJudgeIPAuthenticator
+            form_login:
+                login_path: login
+                check_path: login
+                enable_csrf: true
+                use_referer: true
+
+            logout:
+                path:   logout
+                target: /public
+
+    access_control:
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/markdown-preview, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/public, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

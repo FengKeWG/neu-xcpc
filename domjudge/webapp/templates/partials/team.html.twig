@@ -1,0 +1,62 @@
+{% if team is empty %}
+    <div class="alert alert-danger mt-4">
+        No team found by this id.
+    </div>
+{% else %}
+
+    <div class="row">
+        <div class="col-lg-{{ size | default(4) }}">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>Name</th>
+                    <td>{{ team.effectiveName }}</td>
+                </tr>
+                <tr>
+                    <th>Category</th>
+                    <td>{{ team.category.name }}</td>
+                </tr>
+                {% if team.publicdescription is not empty %}
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ team.publicdescription | nl2br }}</td>
+                    </tr>
+                {% endif %}
+                {% if showAffiliations and team.affiliation is not empty %}
+                    <tr>
+                        <th>Affiliation</th>
+                        <td>
+                        {% set affiliationId = team.affiliation.externalid %}
+                        {% set affiliationLogo = affiliationId | assetPath('affiliation') %}
+                        {% if affiliationLogo %}
+                            <img src="{{ asset(affiliationLogo) }}" alt="{{ team.affiliation.shortname }}"
+                                 title="{{ team.affiliation.shortname }}" class="affiliation-logo">
+                        {% endif %}
+{{ team.affiliation.name }}</td>
+                    </tr>
+                    {% if showFlags and team.affiliation.country is not empty %}
+                        <tr>
+                            <th>Country</th>
+                            <td>
+                                {{ team.affiliation.country | countryFlag(true) }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endif %}
+                {% if team.location is not empty %}
+                    <tr>
+                        <th>Location</th>
+                        <td>{{ team.location }}</td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+    {% set teamId = team.externalid %}
+    {% set teamImage = teamId | assetPath('team') %}
+    {% if teamImage %}
+        <div class="col-lg-{{ size | default(4) }}">
+        <img loading="lazy" class="teampicture" src="{{ asset(teamImage) }}" alt="Picture of team {{ team.effectiveName }}"
+             title="Picture of team {{ team.effectiveName }}">
+        </div>
+    {% endif %}
+    </div>
+{% endif %}

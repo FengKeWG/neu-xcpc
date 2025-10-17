@@ -1,0 +1,138 @@
+#!/bin/sh
+# @configure_input@
+#
+# This script can perform various cleanup tasks on a judgehost.
+
+# Abort when a single command fails:
+set -e
+
+JUDGINGDIR=$(readlink -fn @judgehost_judgedir@)
+PROGNAME=$(basename "$0")
+
+usage() {
+    cat <<EOF
+Usage: $PROGNAME <command>
+Perform various cleanup tasks on a judgehost.
+
+Make sure that no judgings are in process while running this script.
+It is best to temporarily disable the judgehost in the web interface
+or stop the service and wait until all judgings are finished.
+
+This will operate on data under $JUDGINGDIR
+
+Commands:
+
+  procs     Kill any remaining processes running as the restricted
+              domjudge-run* user. These can remain when the judging
+              process aborted in an unexpected way.
+  mounts    Unmount stale bind mounts to the chroot. These can appear
+              when then judgedaemon crashes in the middle of a judging.
+  cache     Delete cached test cases and executables.
+  judgings  Delete detailed logs and compiled programs of judgings.
+              Note that the most important data is stored in the database.
+              The additional data on disk is mostly useful for debugging.
+  all       First kill remaining processes, then unmount stale bind mounts,
+              and finally delete cache and judging data.
+  help      Display this usage information.
+
+EOF
+}
+
+kill_processes() {
+    echo "Killing remaining processes..."
+    pkill -G @RUNGROUP@ || true
+    echo "Done."
+}
+
+cleanup_mounts() {
+    echo "Cleaning up stale mounts..."
+    cut -d ' ' -f 2 /proc/mounts | grep -E "^$JUDGINGDIR" | while IFS= read -r mountpoint; do
+        umount "$mountpoint"
+        echo "Unmounted $mountpoint"
+        sleep 0.1
+    done
+    echo "Done."
+}
+
+cleanup_cache() {
+    echo "Cleaning up cached data..."
+    cd "$JUDGINGDIR"
+    for d in */*; do
+        [ -d "$d" ] || continue
+        cd "$d"
+        echo "  in $d:"
+        for i in testcase executable; do
+            if [ -d "$i/" ]; then
+                echo "    removing $i cache"
+                rm -rf "${i:?}/"
+            fi
+        done
+        cd - >/dev/null
+    done
+    echo "Done."
+}
+
+cleanup_judgings() {
+    if cut -d ' ' -f 2 /proc/mounts | grep -E "^$JUDGINGDIR/" >/dev/null 2>&1; then
+        echo "There are (stale) bind mounts under $JUDGINGDIR/."
+        echo "Make sure that all judgedaemons on this host are stopped, and then"
+        echo "run '$PROGNAME mounts' to clean up any stale bind mounts."
+        exit 1
+    fi
+    echo "Cleaning up judging data..."
+    cd "$JUDGINGDIR"
+    for d in */*; do
+        [ -d "$d" ] || continue
+        cd "$d"
+        echo "  in $d:"
+        find . -maxdepth 1 -type d -regex '\./[0-9]+' | while IFS= read -r submission; do
+            echo "    removing judging data for submission s${submission#./}"
+            rm -rf "${submission:?}/"
+        done
+        cd - >/dev/null
+    done
+    echo "Done."
+}
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This program must be run as root."
+    echo
+    usage
+    exit 1
+fi
+
+case $1 in
+    proc*)
+        kill_processes
+        ;;
+
+    mount*)
+        cleanup_mounts
+        ;;
+
+    cache)
+        cleanup_cache
+        ;;
+
+    judging*)
+        cleanup_judgings
+        ;;
+
+    all)
+        kill_processes
+        cleanup_mounts
+        cleanup_cache
+        cleanup_judgings
+        ;;
+
+    help | --help)
+        usage
+        ;;
+
+    *)
+        echo "Unknown command '$1'."
+        echo
+        usage
+        exit 1
+        ;;
+esac

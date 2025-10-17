@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appendix: Problem format specification &mdash; DOMjudge 9.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/js/versionswitcher.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Appendix: Running DOMjudge as a shadow system" href="shadow.html" />
+    <link rel="prev" title="DOMjudge team manual" href="team.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            DOMjudge
+          </a>
+              <div class="version">
+                9.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-domserver.html">Installation of the DOMserver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-judgehost.html">Installation of the judgehosts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-workstation.html">Installation of the team workstations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-basic.html">Configuring the system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="import.html">Adding contest data in bulk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-advanced.html">Advanced configuration topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running the contest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="judging.html">Judging topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="develop.html">Development</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick-install.html">Appendix: Quick installation checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="team.html">DOMjudge team manual</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Appendix: Problem format specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shadow.html">Appendix: Running DOMjudge as a shadow system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration-reference.html">Appendix: Configuration reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-language.html">Appendix: Installing the example languages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scoring.html">Scoring and scoreboard caching implementation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DOMjudge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Appendix: Problem format specification</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/DOMjudge/domjudge/blob/main/doc/manual/problem-format.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="appendix-problem-format-specification">
+<h1>Appendix: Problem format specification<a class="headerlink" href="#appendix-problem-format-specification" title="Permalink to this heading"></a></h1>
+<p>DOMjudge supports the import and export of problems in a zip-bundle
+format.</p>
+<p>The base of the format is the <a class="reference external" href="https://icpc.io/problem-package-format/spec/legacy-icpc">ICPC problem package specification</a>.</p>
+<dl>
+<dt>On top, DOMjudge defines a few extensions:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">domjudge-problem.ini</span></code> (optional): metadata file, see below.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">problem.{pdf,html,txt}</span></code> (optional): problem statements as
+distributed to participants. The file extension determines any of
+three supported formats. If multiple files matching this pattern are
+available, any one of those will be used.</p></li>
+<li><p>Annotation with <code class="docutils literal notranslate"><span class="pre">&#64;EXPECTED_RESULTS&#64;:</span></code> for jury solutions.
+Use this to annotate the possible outcomes that a submission can have,
+that will be accepted by the Judging verifier.
+This extension is in consideration to be added to the ICPC specification,
+see <a class="reference external" href="https://github.com/Kattis/problem-package-format/pull/4">https://github.com/Kattis/problem-package-format/pull/4</a>.
+Note that, to match with the current ICPC specification,
+the <code class="docutils literal notranslate"><span class="pre">&#64;EXPECTED_RESULTS&#64;:</span></code> tag is ignored in
+the four official submission subdirectories,
+but it will work if the tagged solution is in, e.g.,
+<code class="docutils literal notranslate"><span class="pre">submissions/mixed-verdicts</span></code>, <code class="docutils literal notranslate"><span class="pre">submissions/mixed/</span></code> or <code class="docutils literal notranslate"><span class="pre">submissions/rejected/</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text"><em>Example jury solution with multiple outcomes (Shortened)</em></span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Sample solution in Python for the &quot;boolfind&quot; interactive problem.</span>
+<span class="sd">This will sometimes give an off by one answer. This is a demonstration</span>
+<span class="sd">of how to use the @EXPECTED_RESULTS@ tag.</span>
+
+<span class="sd">@EXPECTED_RESULTS@: CORRECT, WRONG-ANSWER</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">random</span>
+
+</pre></div>
+</div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+<p>The file <code class="docutils literal notranslate"><span class="pre">domjudge-problem.ini</span></code> contains key-value pairs, one
+pair per line, of the form <code class="docutils literal notranslate"><span class="pre">key</span> <span class="pre">=</span> <span class="pre">value</span></code>. The <code class="docutils literal notranslate"><span class="pre">=</span></code> can
+optionally be surrounded by whitespace and the value may be quoted,
+which allows it to contain newlines. The following keys are supported
+(these correspond directly to the problem settings in the jury web
+interface):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> - the problem displayed name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">allow_submit</span></code> - whether to allow submissions to this problem,
+disabling this also makes the problem invisible to teams and public</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">allow_judge</span></code> - whether to allow judging of this problem</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timelimit</span></code> - time limit in seconds per test case</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">special_run</span></code> - executable id of a special run script</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">special_compare</span></code> - executable id of a special compare script</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">points</span></code> - number of points for this problem (defaults to 1)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">color</span></code> - CSS color specification for this problem</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">externalid</span></code> - the external id of the problem</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">short-name</span></code> - the short name of the problem</p></li>
+</ul>
+</div></blockquote>
+<p>The basename of the ZIP-file will be used as the problem external id and short
+name (e.g. “A”). All keys are optional. If they are present, the respective
+value will be overwritten; if not present, then the value will not be changed
+or a default chosen when creating a new problem. Test data files are added to
+set of test cases already present. Thus, one can easily add test cases to a
+configured problem by uploading a zip file that contains only testcase files.
+Any jury solutions present will be automatically submitted when <code class="docutils literal notranslate"><span class="pre">allow_submit</span></code>
+is <code class="docutils literal notranslate"><span class="pre">1</span></code> and there’s a team associated with the uploading user.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="team.html" class="btn btn-neutral float-left" title="DOMjudge team manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="shadow.html" class="btn btn-neutral float-right" title="Appendix: Running DOMjudge as a shadow system" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2004-2025 by the DOMjudge developers and contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

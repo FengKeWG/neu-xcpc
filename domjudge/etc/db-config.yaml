@@ -1,0 +1,406 @@
+# Configuration settings that can be overridden using the `configuration` database table
+-   category: Scoring
+    description: Options related to how scoring is handled.
+    items:
+        -   name: verification_required
+            type: bool
+            default_value: false
+            public: false
+            description: Is manual verification of judgings by jury required before publication?
+        -   name: compile_penalty
+            type: bool
+            default_value: false
+            public: true
+            description: Should submissions with compiler-error incur penalty time (and be shown on the scoreboard)?
+        -   name: penalty_time
+            type: int
+            default_value: 20
+            public: true
+            description: Penalty time in minutes per wrong submission (if eventually solved).
+            regex: /^\d+$/
+            error_message: A non-negative number is required.
+        -   name: results_prio
+            type: array_keyval
+            default_value:
+                memory-limit: 99
+                output-limit: 99
+                run-error: 99
+                timelimit: 99
+                wrong-answer: 99
+                no-output: 99
+                correct: 1
+            public: false
+            description: Priorities of results for determining final result with multiple testcases. Higher priority is used first as final result. With equal priority, the first (ordered by rank) incorrect result determines the final result.
+        -   name: results_remap
+            type: array_keyval
+            default_value: []
+            public: false
+            description: Remap testcase result, e.g. to disable a specific result type such as `no-output`.
+        -   name: score_in_seconds
+            type: bool
+            default_value: false
+            public: true
+            description: Is the scoreboard resolution measured in seconds instead of minutes?
+-   category: Judging
+    description: Options related to how judging is performed.
+    items:
+        -   name: memory_limit
+            type: int
+            default_value: 2097152
+            public: false
+            description: Maximum memory usage (in kB) by submissions. This includes the shell which starts the compiled solution and also any interpreter like the Java VM, which takes away approx. 300MB! Can be overridden per problem.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: output_limit
+            type: int
+            default_value: 8192
+            public: false
+            description: Maximum output (in kB) submissions may generate. Any excessive output is truncated, so this should be greater than the maximum testdata output. Can be overridden per problem.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: process_limit
+            type: int
+            default_value: 64
+            public: false
+            description: Maximum number of processes that the submission is allowed to start (including shell and possibly interpreters).
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: sourcesize_limit
+            type: int
+            default_value: 256
+            public: true
+            description: Maximum source code size (in kB) of a submission.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: sourcefiles_limit
+            type: int
+            default_value: 100
+            public: true
+            description: Maximum number of source files in one submission. Set to `1` to disable multi-file submissions.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: script_timelimit
+            type: int
+            default_value: 30
+            public: false
+            description: Maximum seconds available for compile/compare scripts. This is a safeguard against malicious code and buggy scripts, so a reasonable but large amount should do.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: script_memory_limit
+            type: int
+            default_value: 2097152
+            public: false
+            description: Maximum memory usage (in kB) by compile/compare scripts. This is a safeguard against malicious code and buggy script, so a reasonable but large amount should do.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: script_filesize_limit
+            type: int
+            default_value: 2621440
+            public: false
+            description: Maximum filesize (in kB) compile/compare scripts may write. Submission will fail with compiler-error when trying to write more, so this should be greater than any **intermediate or final** result written by compilers.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: timelimit_overshoot
+            type: string
+            default_value: 1s|10%
+            public: false
+            description: Time that submissions are kept running beyond timelimit before being killed. Specify as `Xs` for X seconds, `Y%` as percentage, or a combination of both separated by one of `+|&` for the sum, maximum, or minimum of both.
+            regex: /^\d+[s%]([+|&]\d+[s%])?$/
+            error_message: Only Xs, Y% or a combination of both separated by one of +|& are allowed.
+        -   name: output_storage_limit
+            type: int
+            default_value: 50000
+            public: false
+            description: Maximum size of error/system output stored in the database (in bytes); use `-1` to disable any limits. See `Display` / `output_display_limit` for how to control the output *shown*.
+            regex: /^([1-9]\d*|-1)$/
+            error_message: A positive number or -1 is required.
+        -   name: lazy_eval_results
+            type: int
+            default_value: 1
+            public: false
+            description: Lazy evaluation of results? If enabled, stops judging as soon as a highest priority result is found, otherwise always all testcases will be judged. On request will not auto-start judging. Analyst mode tries to judge only interesting testcases.
+            options:
+                1: Lazy
+                2: Full judging
+                3: Only on request
+                4: Analyst mode
+            regex: /^[1234]$/
+            error_message: A value between 1 and 3 is required.
+        -   name: judgehost_warning
+            type: int
+            default_value: 30
+            public: false
+            description: Time in seconds after a judgehost last checked in before showing its status as `warning`.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: judgehost_critical
+            type: int
+            default_value: 120
+            public: false
+            description: Time in seconds after a judgehost last checked in before showing its status as `critical`.
+            regex: /^[1-9]\d*$/
+            error_message: A positive number is required.
+        -   name: diskspace_error
+            type: int
+            default_value: 1048576
+            public: false
+            description: Minimum free disk space (in kB) on judgehosts before posting an internal error.
+            regex: /^\d+$/
+            error_message: A non-negative number is required.
+        -   name: default_compare
+            type: string
+            default_value: compare
+            public: false
+            description: The script used to compare outputs if no special compare script specified.
+        -   name: default_run
+            type: string
+            default_value: run
+            public: false
+            description: The script used to run submissions if no special run script specified.
+        -   name: default_full_debug
+            type: string
+            default_value: full_debug
+            public: false
+            description: The script used to compile a full debug package.
+        -   name: enable_parallel_judging
+            type: bool
+            default_value: true
+            public: false
+            description: Are submissions judged by multiple judgehosts in parallel?
+        -   name: judgehost_activated_by_default
+            type: bool
+            default_value: true
+            public: false
+            description: Activate a judgehost when it registers for the first time.
+-   category: Clarifications
+    description: Options related to clarifications.
+    items:
+        -   name: clar_categories
+            type: array_keyval
+            default_value:
+                general: General issue
+                tech: Technical issue
+            public: true
+            description: List of additional clarification categories.
+        -   name: clar_answers
+            type: array_val
+            default_value:
+                - No comment.
+                - Read the problem statement carefully.
+            public: false
+            description: List of pre-defined clarification answers.
+        -   name: clar_queues
+            type: array_keyval
+            default_value: []
+            public: true
+            description: List of clarification queues.
+        -   name: clar_default_problem_queue
+            type: string
+            default_value: ""
+            public: true
+            description: Queue to assign to problem clarifications.
+-   category: Display
+    description: Options related to the DOMjudge user interface.
+    items:
+        -   name: output_display_limit
+            type: int
+            default_value: 2000
+            public: false
+            description: Maximum size of run/diff/error/system output shown in the jury interface (in bytes); use `-1` to disable any limits.
+            regex: /^([1-9]\d*|-1)$/
+            error_message: A positive number or -1 is required.
+        -   name: show_pending
+            type: bool
+            default_value: true
+            public: true
+            description: Show pending submissions on the scoreboard?
+        -   name: show_flags
+            type: bool
+            default_value: true
+            public: true
+            description: Show country information in the interfaces?
+        -   name: show_affiliations
+            type: bool
+            default_value: true
+            public: true
+            description: Show affiliation names in the interfaces?
+        -   name: show_affiliation_logos
+            type: bool
+            default_value: false
+            public: true
+            description: Show affiliation logos on the scoreboard?
+        -   name: show_teams_submissions
+            type: bool
+            default_value: true
+            public: true
+            description: Show problem columns with submission information on the public and team scoreboards?
+        -   name: show_compile
+            type: int
+            default_value: 2
+            public: true
+            description: Show compile output in team webinterface?
+            options:
+                0: never
+                1: only on compilation error(s)
+                2: always
+            regex: /^\d+$/
+            error_message: A value between 0 and 2 is required.
+        -   name: show_sample_output
+            type: bool
+            default_value: false
+            public: true
+            description: Should teams be able to view a diff of their and the reference output on sample testcases?
+        -   name: show_too_late_result
+            type: bool
+            default_value: false
+            public: true
+            description: Show results of TOO-LATE submissions in team interface?
+        -   name: show_balloons_postfreeze
+            type: bool
+            default_value: false
+            public: true
+            description: Give out balloon notifications after the scoreboard has been frozen?
+        -   name: show_relative_time
+            type: bool
+            default_value: false
+            public: true
+            description: Print times of contest events relative to contest start (instead of absolute).
+        -   name: time_format
+            type: string
+            default_value: "H:i"
+            public: false
+            description: The format used to print times. For formatting options see the [PHP `DateTime::format` function](https://www.php.net/manual/en/datetime.format.php).
+        -   name: thumbnail_size
+            type: int
+            default_value: 200
+            public: false
+            description: Maximum width/height of a thumbnail for uploaded testcase images.
+            regex: /^\d+$/
+            error_message: A non-negative number is required.
+        -   name: show_limits_on_team_page
+            type: bool
+            default_value: true
+            public: true
+            description: Show time and memory limit on the team problems page.
+        -   name: allow_team_submission_download
+            type: bool
+            default_value: false
+            public: true
+            description: Allow teams to download their own submission code.
+            docdescription: |
+                Note that enabling this option means that if someone gets access to the account of a team, they can download
+                the source code of all submissions from that team. When this option is disabled, getting access to the account
+                of a team only allows someone to submit as that team, which can then easily be ignored by the jury later.
+        -   name: team_column_width
+            type: int
+            default_value: 0
+            public: false
+            description: Maximum width of team column on scoreboard. Leave `0` for no maximum.
+            regex: /^\d+$/
+            error_message: A non-negative number is required.
+        -   name: show_public_stats
+            type: bool
+            default_value: true
+            public: true
+            description: Show submission and problem statistics on the team and public pages.
+        -   name: show_language_versions
+            type: bool
+            default_value: false
+            public: true
+            description: Show canonical compiler and runner version on the team pages.
+        -   name: show_teams_on_scoreboard
+            type: int
+            default_value: 0
+            public: true
+            description: Show teams on the scoreboard?
+            options:
+                0: Always
+                1: After login
+                2: After first submission
+            regex: /^\d+$/
+            error_message: A value between 0 and 2 is required.
+        -   name: enable_ranking
+            type: bool
+            default_value: true
+            public: true
+            description: If disabled, no ranking information is shown to contestants.
+-   category: Authentication
+    description: Options related to authentication.
+    items:
+        -   name: auth_methods
+            type: array_val
+            default_value: []
+            public: false
+            description: List of allowed additional authentication methods.
+            docdescription: See :ref:`authentication` for more information.
+            options:
+                - ipaddress
+                - xheaders
+        -   name: ip_autologin
+            type: bool
+            default_value: false
+            public: false
+            description: Enable to skip the login page when using IP authentication.
+-   category: External systems
+    description: Miscellaneous configuration options.
+    items:
+        -   name: print_command
+            type: string
+            default_value: ""
+            public: true
+            description: If set, enable teams and jury to send source code to this command. See admin manual for allowed arguments.
+            docdescription: See :ref:`printing` for more information.
+        -   name: event_feed_format
+            type: enum
+            default_value: 2022-07
+            enum_class: App\Utils\EventFeedFormat
+            public: false
+            description: Format of the event feed to use. See [current draft](https://ccs-specs.icpc.io/draft/contest_api#event-feed) and [versions available](https://ccs-specs.icpc.io/).
+        -   name: shadow_mode
+            type: bool
+            default_value: false
+            public: false
+            description: Is this system running as a shadow system?
+            docdescription: See :doc:`the chapter on running DOMjudge as a shadow system<shadow>` for more information.
+        -   name: external_contest_sources_allow_untrusted_certificates
+            type: bool
+            default_value: false
+            public: false
+            description: Whether to allow untrusted TLS certificates when reading from external contest sources.
+        -   name: external_judgement_types
+            type: array_keyval
+            key_placeholder: ID
+            value_placeholder: Name
+            default_value: []
+            public: true
+            description: List of additional judgement types as reported by the external CCS. All assumed to give a penalty.
+        -   name: external_ccs_submission_url
+            type: string
+            default_value: ""
+            public: false
+            description: URL of a submission detail page on the external CCS. Placeholder `[id]` will be replaced by submission ID and `[contest]` by the contest ID. Leave empty to not display links to external CCS.
+            docdescription: See :doc:`the chapter on running DOMjudge as a shadow system<shadow>` for more information.
+        -   name: icat_url
+            type: string
+            default_value: ""
+            public: false
+            description: URL of an ICPC iCAT instance if such is available; will be linked to from the submission verification box.
+            docdescription: See https://github.com/icpc-live/autoanalyst
+        -   name: external_contest_source_critical
+            type: int
+            default_value: 120
+            public: false
+            description: Time in seconds after an external contest source reader last checked in before showing its status as `critical`.
+            regex: /^\d+$/
+            error_message: A non-negative number is required.
+        -   name: check_new_version
+            type: enum
+            enum_class: App\Utils\UpdateStrategy
+            default_value: none
+            public: false
+            description: Automatically check and notify for new DOMjudge releases?
+        -   name: adminer_enabled
+            type: bool
+            default_value: false
+            public: false
+            description: Is the Adminer Database Editor enabled?

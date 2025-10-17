@@ -1,0 +1,27 @@
+<script>
+    var alpha3_alpha2_country_mapping = {{ alpha3_alpha2_country_mapping | json_encode | raw }};
+
+    var template = function(element) {
+        var imgBase = "{{ asset('flags/4x3/nl.svg') }}";
+
+        var img = element.element == undefined ||
+            element.element.value == undefined ||
+            element.element.value == ""
+            ? ''
+            : '<img src="' + imgBase.replace("nl.svg", alpha3_alpha2_country_mapping[element.element.value].toLowerCase() + ".svg", 1) + '" class="countryflag" alt="">&nbsp;';
+
+        return img + element.text;
+    };
+
+    $('{{ field }}').select2({
+        templateResult: template,
+        templateSelection: template,
+
+        // Prevent escaping
+        escapeMarkup: function(t) {
+            return t;
+        },
+        theme: "bootstrap-5"
+    });
+
+</script>

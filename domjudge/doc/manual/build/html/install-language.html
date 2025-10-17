@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appendix: Installing the example languages &mdash; DOMjudge 9.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/js/versionswitcher.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scoring and scoreboard caching implementation" href="scoring.html" />
+    <link rel="prev" title="Appendix: Configuration reference" href="configuration-reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            DOMjudge
+          </a>
+              <div class="version">
+                9.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-domserver.html">Installation of the DOMserver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-judgehost.html">Installation of the judgehosts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-workstation.html">Installation of the team workstations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-basic.html">Configuring the system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="import.html">Adding contest data in bulk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-advanced.html">Advanced configuration topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running the contest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="judging.html">Judging topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="develop.html">Development</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick-install.html">Appendix: Quick installation checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="team.html">DOMjudge team manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problem-format.html">Appendix: Problem format specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shadow.html">Appendix: Running DOMjudge as a shadow system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration-reference.html">Appendix: Configuration reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Appendix: Installing the example languages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scoring.html">Scoring and scoreboard caching implementation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DOMjudge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Appendix: Installing the example languages</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/DOMjudge/domjudge/blob/main/doc/manual/install-language.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="appendix-installing-the-example-languages">
+<h1>Appendix: Installing the example languages<a class="headerlink" href="#appendix-installing-the-example-languages" title="Permalink to this heading"></a></h1>
+<p>DOMjudge ships with some default languages with a default configuration.
+As you might set up contests with those languages we provide how those languages were
+installed in the past as guideline. Use <code class="docutils literal notranslate"><span class="pre">dj_run_chroot</span></code> for most of those packages, and see
+the section <a class="reference internal" href="install-judgehost.html#make-chroot"><span class="std std-ref">Creating a chroot environment</span></a> for more information.</p>
+<p>Most of the languages can be installed from the table below as there is a package available
+to install inside the judging chroot. Given that you can install your own chroot we only provide the
+packages for Ubuntu as that is the most used at the moment of writing.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Packages for languages</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Language</p></th>
+<th class="head"><p>Ubuntu package</p></th>
+<th class="head"><p>Remarks</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Ada</p></td>
+<td><p><cite>gnat</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>AWK</p></td>
+<td><p><cite>mawk</cite>/<cite>gawk</cite></p></td>
+<td><p><cite>mawk</cite> is default installed</p></td>
+</tr>
+<tr class="row-even"><td><p>Bash</p></td>
+<td><p><cite>bash</cite></p></td>
+<td><p>Default installed in the chroot</p></td>
+</tr>
+<tr class="row-odd"><td><p>C</p></td>
+<td><p><cite>gcc</cite></p></td>
+<td><p>Default installed in the chroot</p></td>
+</tr>
+<tr class="row-even"><td><p>C++</p></td>
+<td><p><cite>g++</cite></p></td>
+<td><p>Default installed in the chroot</p></td>
+</tr>
+<tr class="row-odd"><td><p>C#</p></td>
+<td><p><cite>mono-mcs</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Fortran</p></td>
+<td><p><cite>gfortran</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Haskell</p></td>
+<td><p><cite>ghc</cite></p></td>
+<td><p>After installing you need to move these files
+<cite>/{usr-&gt;var}/lib/ghc/package.conf.d</cite> as <cite>/var</cite>
+is not mounted during compilation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Java</p></td>
+<td><p><cite>default-jdk-headless</cite></p></td>
+<td><p>Default installed in the chroot</p></td>
+</tr>
+<tr class="row-odd"><td><p>Javascript</p></td>
+<td><p><cite>nodejs</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Kotlin</p></td>
+<td><p><cite>kotlin</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Lua</p></td>
+<td><p><cite>lua5.4</cite></p></td>
+<td><p>Ubuntu does not ship a generic meta package (yet).</p></td>
+</tr>
+<tr class="row-even"><td><p>Pascal</p></td>
+<td><p><cite>fp-compiler</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Perl</p></td>
+<td><p><cite>perl-base</cite></p></td>
+<td><p>Default installed in the chroot</p></td>
+</tr>
+<tr class="row-even"><td><p>POSIX shell</p></td>
+<td><p><cite>dash</cite></p></td>
+<td><p>Default installed in the chroot</p></td>
+</tr>
+<tr class="row-odd"><td><p>Prolog</p></td>
+<td><p><cite>swi-prolog-core-packages</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Python3</p></td>
+<td><p><cite>pypy3</cite>/<cite>python3</cite></p></td>
+<td><p>Default installed in the chroot.
+DOMjudge assumes <cite>pypy3</cite> as it runs faster in general.
+Consider the <a class="reference external" href="https://launchpad.net/~pypy/+archive/ubuntu/ppa">PyPy3 PPA</a> if you need the latest python3 features. PyPy3 does not have 100%
+compatibility with all non-standard libraries. In case this is needed you should reconsider the default
+CPython implementation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>OCaml</p></td>
+<td><p><cite>ocaml</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>R</p></td>
+<td><p><cite>r-base-core</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Ruby</p></td>
+<td><p><cite>ruby</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Rust</p></td>
+<td><p><cite>rustc</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Scala</p></td>
+<td><p><cite>scala</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Swift</p></td>
+<td></td>
+<td><p>See the <a class="reference external" href="https://www.swift.org/documentation/server/guides/deploying/ubuntu.html">Swift instructions</a>, unpack the directory in the chroot and install <cite>libncurses6</cite>. Depending
+on where you install the directory you might need to extend the <cite>PATH</cite> in the <cite>run</cite> script.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="configuration-reference.html" class="btn btn-neutral float-left" title="Appendix: Configuration reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scoring.html" class="btn btn-neutral float-right" title="Scoring and scoreboard caching implementation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2004-2025 by the DOMjudge developers and contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

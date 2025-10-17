@@ -1,0 +1,103 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}Category {{ teamCategory.categoryid }} - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    {{ knp_pagination_rel_links(submissions) }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Category {{ teamCategory.name }}</h1>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ teamCategory.categoryid }}</td>
+                </tr>
+                <tr>
+                    <th>External ID</th>
+                    <td>{{ teamCategory.externalid }}</td>
+                </tr>
+                <tr>
+                    <th>ICPC ID</th>
+                    <td>
+                        {% if teamCategory.icpcid %}
+                            {{ teamCategory.icpcid }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Sortorder</th>
+                    <td>{{ teamCategory.sortorder }}</td>
+                </tr>
+                {% if teamCategory.color %}
+                    <tr>
+                        <th>Color</th>
+                        <td style="background-color: {{ teamCategory.color }};">{{ teamCategory.color }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <th>Visible</th>
+                    <td>{{ teamCategory.visible | printYesNo }}</td>
+                </tr>
+                <tr>
+                    <th>Allow self-registration</th>
+                    <td>{{ teamCategory.allowSelfRegistration | printYesNo }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    {%- if is_granted('ROLE_ADMIN') -%}
+        <p>
+            {{ button(path('jury_team_category_edit', {'categoryId': teamCategory.categoryid}), 'Edit', 'primary', 'edit') }}
+            {{ button(path('jury_team_category_delete', {'categoryId': teamCategory.categoryid}), 'Delete', 'danger', 'trash-alt', true) }}
+            {{ button(path('jury_team_category_request_remaining', {'categoryId': teamCategory.categoryid}), 'Judge remaining testcases', 'secondary', 'gavel') }}
+        </p>
+    {% endif %}
+
+    <h3>Teams</h3>
+    {% if teamCategory.teams is empty %}
+        <p class="nodata">no teams</p>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-4">
+                <table class="data-table table table-sm table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th style="text-align: right;">ID</th>
+                        <th>Teamname</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for team in teamCategory.teams %}
+                        <tr>
+                            <td style="text-align: right">
+                                <a href="{{ path('jury_team', {'teamId': team.teamid}) }}">{{ team | entityIdBadge('t') }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ path('jury_team', {'teamId': team.teamid}) }}">{{ team.effectiveName }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h3>Submissions</h3>
+
+        <div data-ajax-refresh-target>
+            {%- include 'jury/partials/submission_list.html.twig' with {showTestcases: false} %}
+        </div>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% use 'bootstrap_5_layout.html.twig' %}
+
+{% block choice_widget_collapsed -%}
+    {%- set attr = attr | merge({class: (attr.class | default('') ~ ' form-control form-select') | trim}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed %}
+
+{% block button_widget -%}
+    {% set attr = attr | merge({class: (attr.class | default('') ~ ' btn') | trim}) %}
+    {% if label is empty -%}
+        {%- if label_format is not empty -%}
+            {% set label = label_format | replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name | humanize %}
+        {%- endif -%}
+    {%- endif -%}
+    {% if icon | default %}
+        {% set iconHtml = '<i class="fa ' ~ icon ~ '"></i> ' %}
+    {% else %}
+        {% set iconHtml = '' %}
+    {% endif %}
+    <button type="{{ type | default('button') }}" {{ block('button_attributes') }}>{{ iconHtml | raw }}{{ label | trans({}, translation_domain) }}</button>
+{%- endblock button_widget %}
+
+{% block form_widget_simple %}
+    {% if input_group_before is defined or input_group_after is defined %}
+        <div class="input-group">
+    {% endif %}
+    {% if input_group_before is defined %}
+        <span class="input-group-text">{{ input_group_before | raw }}</span>
+    {% endif %}
+    {{- parent() -}}
+    {% if input_group_after is defined %}
+        <span class="input-group-text">{{ input_group_after | raw }}</span>
+    {% endif %}
+    {% if input_group_before is defined or input_group_after is defined %}
+        </div>
+    {% endif %}
+{% endblock %}

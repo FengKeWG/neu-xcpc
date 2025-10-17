@@ -1,0 +1,152 @@
+{% extends "jury/base.html.twig" %}
+{% import "jury/jury_macros.twig" as macros %}
+
+{% block title %}User {{ user.userid }} - {{ parent() }}{% endblock %}
+
+{% block extrahead %}
+    {{ parent() }}
+    {{ macros.table_extrahead() }}
+    {{ knp_pagination_rel_links(submissions) }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>User {{ user.name }}</h1>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ user.userid }}</td>
+                </tr>
+                <tr>
+                    <th>External ID</th>
+                    <td>{{ user.externalid }}</td>
+                </tr>
+                <tr>
+                    <th>Login</th>
+                    <td class="teamid">{{ user.username }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>
+                        {% if user.email %}
+                            <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Password</th>
+                    <td>
+                        {% if user.password %}
+                            Set
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>IP address</th>
+                    <td>
+                        {% if user.ipAddress %}
+                            {{ user.ipAddress }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Enabled</th>
+                    <td>
+                        {{ user.enabled | printYesNo }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Roles</th>
+                    <td>
+                        {% for role in user.userRoles %}
+                            {{ role.description }}<br>
+                        {% else %}
+                            No roles assigned
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Team</th>
+                    {% if user.team %}
+                        <td class="teamid">
+                            <a href="{{ path('jury_team', {'teamId': user.team.teamid}) }}">
+                                {{ user.team.effectiveName }} {{ user.team | entityIdBadge('t') }}
+                            </a>
+                        </td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-lg-4">
+            <table class="table table-sm table-striped">
+                <tr>
+                    <th>First login</th>
+                    <td>
+                        {% if user.firstLogin %}
+                            {{ user.firstLogin | printtime('D d M Y H:i:s T') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Last login</th>
+                    <td>
+                        {% if user.lastLogin %}
+                            {{ user.lastLogin | printtime('D d M Y H:i:s T') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Last API login</th>
+                    <td>
+                        {% if user.lastApiLogin %}
+                            {{ user.lastApiLogin | printtime('D d M Y H:i:s T') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Last IP</th>
+                    <td>
+                        {% if user.lastIpAddress %}
+                            {{ user.lastIpAddress | printHost(true) }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="button-row">
+        {%- if is_granted('ROLE_ADMIN') -%}
+            {{ button(path('jury_user_edit', {'userId': user.userid}), 'Edit', 'primary', 'edit') }}
+            {{ button(path('jury_user_delete', {'userId': user.userid}), 'Delete', 'danger', 'trash-alt', true) }}
+        {% endif %}
+        {% include 'jury/partials/rejudge_form.html.twig' with {table: 'user', id: user.userid, buttonClass: 'btn-secondary'} %}
+    </div>
+
+    <h2>Submissions for {{ user.name }}</h2>
+
+    <div data-ajax-refresh-target>
+        {%- include 'jury/partials/submission_list.html.twig' with {showTestcases: false} %}
+    </div>
+
+{% endblock %}

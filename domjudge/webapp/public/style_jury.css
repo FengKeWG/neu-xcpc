@@ -1,0 +1,250 @@
+h1,h2,h3,h4,h5,h6 {
+    text-align: left;
+}
+h1 {
+    font-size: 2em;
+    margin-top: .5rem;
+}
+.frozen { font-style: italic; }
+
+.teamstatus { text-align: center; }
+.teamstatus img { vertical-align: middle; }
+
+.highlight { background-color: yellow !important; }
+
+.highlight.roweven, .highlight.even { background-color: yellow !important; }
+.highlight.rowodd, .highlight.odd { background-color: #ffffaa !important; }
+
+.size {
+    text-align: right;
+    font-family: monospace;
+}
+
+.md5 { font-family: monospace; }
+
+.testcases td {
+    vertical-align: middle;
+    padding: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.testcases_prev { font-size: xx-small; }
+tr.summary td { border-top: 1px solid black; }
+
+.testrank {
+    text-align: center;
+}
+
+.testsample {
+    text-align: center;
+    max-width: 200px;
+}
+
+.testdesc {
+    max-width: 400px;
+}
+
+/* set cell padding to 0 and <a> tag to 3 to make all of cell
+   clickable in the jury scoreboard and for all team cells */
+.scoreboard_jury td, .scoreboard_jury th { padding: 0; }
+
+/* show pending submissions using a blue corner */
+.score_pending.score_correct             { background: linear-gradient(45deg, #60e760 85%, #6666ff 85%); }
+.score_pending.score_correct.score_first { background: linear-gradient(45deg, #1daa1d 85%, #6666ff 85%); }
+.score_pending.score_incorrect           { background: linear-gradient(45deg, #e87272 85%, #6666ff 85%); }
+
+#submission_layout { width: 100%; }
+
+#djlogo {
+    position: absolute; right: 1ex;
+    width: 93px; height: 196px;
+}
+
+a.collapse { color: black; text-decoration: none; }
+
+.judgetime { font-size: smaller; font-style: italic; }
+
+.config_input { width: 9em; }
+
+/* configchecker */
+.O { background-color: #ccfbcc; }
+.W { background-color: #f0e68c; }
+.E { background-color: #fa9972; }
+
+/* diff colors for source contents and filenames */
+.diff-add        { color: green; }
+.diff-del        { color: red; }
+.diff-changed    { color: darkorange; }
+.diff-endline    { font-weight: bold; }
+.file-diff-table { width: auto; }
+.file-diff-table tr th { padding-right: 10px; }
+
+.col1 { float: left;  width: 30%; }
+.col2 { float: right; width: 70%; }
+.nomorecol { clear: left; }
+
+.thleft { text-align: left; }
+.tdcenter { text-align: center; }
+.tdcenter img {  vertical-align: text-top; }
+.tdright { text-align: right; }
+.teamstat { text-align: right; }
+
+div.submissions-filter > p {
+    position: relative;
+}
+
+div.submissions-filter > p > span {
+    position: absolute;
+    top: 3px;
+}
+
+div.submissions-filter ul.token-input-list {
+    display: inline-block;
+    position: relative;
+    left: 100px;
+}
+
+.tc_box_small {
+    text-align: center;
+    font-size: 65%;
+    width: 1.0em;
+    display: inline-block;
+    padding: 1px;
+    margin: 1px;
+    color: black;
+}
+.tc_list_small {
+    max-width:500px;
+}
+
+.data-table  td.testcase-results {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.has_tooltip {
+    text-decoration: dotted underline;
+}
+
+div.submission-summary > span {
+    margin-right: 10px;
+}
+
+/* fixes for bootstrap-toggle and bootstrap4 */
+.toggle-off {
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+}
+.toggle.off {
+    border-color: rgba(0, 0, 0, .25);
+}
+.toggle-handle {
+    background-color: white;
+    border: thin rgba(0, 0, 0, .25) solid;
+}
+.listtoggles {
+    width: 6em;
+}
+.btn-xs,
+.btn-group-xs > .btn {
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+
+.table td.thick-border {
+    border-top: 1px solid #bbbec1;
+}
+
+.importexport h2 {
+    margin-top: 1rem;
+}
+.importexport div.tile {
+    background-color: aliceblue;
+    padding: 1rem;
+    margin: .5rem;
+    height: 95%;
+}
+.importexport div.tile h3 {
+    font-size: 22px;
+}
+
+.clr-field {
+    display: block !important;
+}
+
+.clr-picker .clr-alpha {
+    display: none;
+}
+
+.inline-verify-form p {
+    margin-bottom: 0;
+}
+
+.table-3-striped tbody tr:nth-of-type(6n+1),
+.table-3-striped tbody tr:nth-of-type(6n+2),
+.table-3-striped tbody tr:nth-of-type(6n+3) {
+    background-color: rgba(0,0,0,.05);
+}
+
+.button-row {
+    margin-bottom: 1rem;
+}
+
+table.submissions-table {
+    width: auto;
+}
+
+.devmode {
+    background-color: #295d8a !important;
+}
+
+.devmode-icon {
+    color: white;
+}
+
+.table-full-clickable-cell {
+    border-collapse: separate; /* Because we need to set display:table for <a> we need to override this */
+    border-spacing: 0px 0px;
+}
+
+.table-full-clickable-cell tbody td:not(.testcase-results) {
+    padding: 0;
+}
+
+.table-full-clickable-cell tbody tr td:not(.testcase-results) a:not(.btn-sm),
+.table-full-clickable-cell tbody tr td:not(.testcase-results) a:hover:not(.btn-sm) {
+    display: table;
+}
+
+.table-full-clickable-cell tbody td:not(.testcase-results) a {
+    width: 100%;
+    height: 100%;
+    padding: 1px .25rem;
+    display: block; /* This is needed to make cells with .showlink fully clickable */
+}
+
+.table-full-clickable-cell tbody td:not(.testcase-results) a.btn-sm {
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+}
+
+/* Below is to re-align the `claim` button on the submission list overview */
+table.table-full-clickable-cell thead.thead-light tr th.table-button-head-right {
+    padding-left: 0;
+}
+
+table.table-full-clickable-cell thead.thead-light tr th.table-button-head-left {
+    padding-right: 0.5rem;
+}
+
+table.table-full-clickable-cell tr .table-button-head-right-right{
+    padding-left: 0.5rem;
+}
+
+.execid {
+    font-family: monospace;
+}
+
+.timebutton {
+    min-width: 9em;
+}
