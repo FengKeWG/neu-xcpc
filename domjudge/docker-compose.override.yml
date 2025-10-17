@@ -11,3 +11,4 @@ services:
     working_dir: /opt/domjudge
     environment:
       - PROJECT_DIR=/opt/domjudge
+      - DEBMIRROR=https://mirrors.tuna.tsinghua.edu.cn/ubuntu/
