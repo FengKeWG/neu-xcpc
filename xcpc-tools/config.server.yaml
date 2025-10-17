@@ -1,0 +1,15 @@
+type: domjudge # server | domjudge | hydro
+viewPass: 7MqI0OsL # use admin / viewPass to login
+secretRoute: EEx2x5CqUxeC
+seatFile: /home/icpc/Desktop/seats.txt
+customKeyfile: 
+# DOMjudge 对接设置（与容器内 domjudge 服务直连）
+server: http://domjudge
+# 可选：指定比赛 ID（不填则自动获取，适用于 DOMjudge）
+contestId: 
+# 认证二选一：token 或 用户名/密码
+token: 
+username: admin
+password: 
+monitor:
+  timeSync: false
