@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
 
   xcpc-tools:
-    image: dockerproxy.com/library/debian:bookworm-slim
+    image: hub.rat.dev/library/debian:bookworm-slim
     container_name: xcpc-tools
     user: "1000:1000"
     working_dir: /app

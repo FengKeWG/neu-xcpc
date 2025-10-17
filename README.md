@@ -27,20 +27,16 @@ docker compose exec domjudge cat /opt/domjudge/etc/initial_admin_password.secret
 
 访问 DOMjudge：`http://<服务器IP>:12345`
 
-### 3) 生成 DOMjudge API Token
+### 3) 配置 XCPC-TOOLS 凭据
 
-1) 使用初始管理员登录 DOMjudge 后台。
-2) 右上角用户名 → API tokens → Create new token → 复制生成的 Token（只显示一次）。
-3) 编辑宿主机的 `/mnt/data/xcpc-tools/config.yaml`，填写：
+编辑 `./xcpc-tools/config.yaml` 填写 DOMjudge 的后台账户：
 
 ```yaml
 type: domjudge
 server: http://domjudge
-token: "<上一步复制的token>"
-# 使用 token 时可删除 username/password 字段
+username: admin
+password: "<initial_admin_password>"
 ```
-
-提示：如不使用 token，也可保留 `username/password`（例如管理员账户与初始密码）。
 
 ### 4) 启动 XCPC-TOOLS（已准备好 config.yaml）
 
