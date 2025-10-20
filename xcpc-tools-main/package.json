@@ -1,0 +1,39 @@
+{
+  "name": "xcpc-tools-workspace",
+  "packageManager": "yarn@4.2.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "packages/machine-setup/frontend"
+  ],
+  "scripts": {
+    "dev:client": "node -r ./register.js packages/server/index.ts --client --debug",
+    "dev:server": "node -r ./register.js packages/server/index.ts --debug",
+    "lint": "eslint packages --ext js,ts,tsx,jsx",
+    "build": "yarn build:ui && node -r ./register.js build.ts",
+    "build:server": "node -r ./register.js build.ts",
+    "build:pkg": "yarn build:ui && node -r ./register.js build.ts && pkg dist/xcpc-tools.js --targets linux,macos,win --out-path dist/pkg"
+  },
+  "devDependencies": {
+    "@expo-google-fonts/noto-sans-sc": "^0.4.1",
+    "@hydrooj/eslint-config": "^2.0.3",
+    "@hydrooj/register": "^1.0.3",
+    "@hydrooj/utils": "^1.4.36",
+    "@neutralinojs/neu": "^11.5.0",
+    "@types/lodash": "^4.17.20",
+    "@types/node": "^20.19.10",
+    "@yao-pkg/pkg": "^6.6.0",
+    "chardet": "^2.1.0",
+    "dejavu-fonts-ttf": "^2.37.3",
+    "eslint": "^9.33.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "iconv-lite": "^0.6.3",
+    "lodash": "^4.17.21",
+    "postject": "^1.0.0-alpha.6",
+    "typescript": "5.8.3"
+  },
+  "resolutions": {
+    "formidable": "patch:formidable@npm%3A2.1.2#~/.yarn/patches/formidable-npm-2.1.2-40ba18d67f.patch",
+    "http-proxy@npm:^1.18.1": "patch:http-proxy@npm%3A1.18.1#~/.yarn/patches/http-proxy-npm-1.18.1-a313c479c5.patch"
+  }
+}

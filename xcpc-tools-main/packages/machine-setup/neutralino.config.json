@@ -1,0 +1,57 @@
+{
+  "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
+  "applicationId": "org.hydro.xcpctools.machinesetup",
+  "version": "1.0.0",
+  "defaultMode": "window",
+  "port": 0,
+  "documentRoot": "/frontend/dist/",
+  "url": "/",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "logging": {
+    "enabled": false,
+    "writeToLogFile": false
+  },
+  "nativeAllowList": [
+    "app.*",
+    "os.*",
+    "computer.*",
+    "filesystem.*",
+    "debug.log"
+  ],
+  "modes": {
+    "window": {
+      "title": "@hydro/xcpc-tools/machine-setup",
+      "width": 1280,
+      "height": 720,
+      "minWidth": 800,
+      "minHeight": 500,
+      "center": true,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "icon": "/frontend/public/hydro.png",
+      "enableInspector": false,
+      "borderless": false,
+      "maximize": false,
+      "hidden": false,
+      "resizable": true,
+      "exitProcessOnClose": false
+    }
+  },
+  "cli": {
+    "binaryName": "hydro-xcpctools-machine-setup",
+    "resourcesPath": "/frontend/",
+    "extensionsPath": "/extensions/",
+    "binaryVersion": "5.5.0",
+    "clientVersion": "5.4.0",
+    "frontendLibrary": {
+      "projectPath": "/frontend/",
+      "initCommand": "yarn",
+      "devCommand": "yarn dev",
+      "buildCommand": "yarn build",
+      "patchFile": "/frontend/index.html",
+      "devUrl": "http://localhost:5173/"
+    }
+  }
+}
