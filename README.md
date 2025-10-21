@@ -1,4 +1,23 @@
-## 一键部署：DOMjudge + MariaDB + XCPC-TOOLS
+## 非 Docker（Ubuntu 24.04 裸机）
+
+1) 一键安装（默认端口 11451）
+
+```bash
+git clone https://github.com/FengKeWG/neu-xcpc.git
+cd neu-xcpc
+bash scripts/install.sh
+```
+
+- 访问 DOMjudge：`http://<服务器IP>:11451/domjudge`
+- 初始管理员密码：`/opt/domjudge/domserver/etc/initial_admin_password.secret`
+- 评测机：自动安装并启动 `domjudge-judgedaemon@0`，`/opt/domjudge/judgehost/etc/restapi.secret` 自动匹配端口
+- 访问 XCPC-TOOLS：`http://<服务器IP>:5283`
+- XCPC-TOOLS: 配置在 `/opt/xcpc-tools/config.server.yaml`
+- 自定义端口：设置环境变量 `HTTP_PORT=<端口>` 后再运行脚本
+
+---
+
+## Docker 部署（开发/演示用）
 
 ### 1) 准备宿主目录与权限
 
