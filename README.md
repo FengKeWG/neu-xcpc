@@ -1,4 +1,4 @@
-## 非 Docker（Ubuntu 24.04 裸机）
+## 方式1：非 Docker 部署（Ubuntu 24.04 裸机）
 
 1) 一键安装（默认端口 11451）
 
@@ -17,7 +17,7 @@ bash scripts/install.sh
 
 ---
 
-## Docker 部署（开发/演示用）
+## 方式2：Docker 部署
 
 ### 1) 准备宿主目录与权限
 
