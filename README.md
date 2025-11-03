@@ -72,3 +72,90 @@ docker compose logs -f xcpc-tools
 - DOMjudge 初始化缓慢：日志停在 `debootstrap` 下载属正常，已配置国内镜像；也可容器内执行 `dj_make_chroot -y -m <镜像>` 加速。
 - 权限问题：确保宿主目录属主为 `1000:1000` 且关键脚本具备执行位；如从 Windows 拷贝，可使用 `dos2unix` 纠正换行。
 
+---
+
+## 批量部署选手机 Monitor（Linux，pssh）
+
+前提：控制端可免密 SSH 登录所有选手机（或使用同一密码，并在命令中改用 `-A` 交互）。服务端地址为 `http://<SERVER>:5283`。
+
+1) 安装 parallel-ssh
+
+```bash
+sudo apt-get update && sudo apt-get install -y pssh
+```
+
+2) 准备 IP 列表（每行一个）
+
+```bash
+cat > ips.txt <<'EOF'
+10.0.0.101
+10.0.0.102
+# ...
+EOF
+```
+
+3) 设置变量（把 SERVER 换成你的服务端 IP/域名）
+
+```bash
+SERVER=10.0.0.1
+REPORT="http://${SERVER}:5283/report"
+USER=root
+OPTS="-O StrictHostKeyChecking=no"
+```
+
+4) 保障依赖（目标机安装 curl）
+
+```bash
+pssh -h ips.txt -l $USER $OPTS "which curl >/dev/null 2>&1 || (sudo apt-get update -y && sudo apt-get install -y curl)"
+```
+
+5) 分发监控脚本并安装为可执行
+
+```bash
+pscp -h ips.txt -l $USER $OPTS xcpc-tools-main/scripts/monitor /tmp/monitor
+pssh -h ips.txt -l $USER $OPTS "sudo install -m 0755 /tmp/monitor /usr/local/bin/xcpc-monitor"
+```
+
+6) 下发 systemd 定时器（每 30s 上报一次）并启用
+
+```bash
+pssh -h ips.txt -l $USER $OPTS "sudo bash -lc '
+cat >/etc/systemd/system/xcpc-monitor.service <<EOF
+[Unit]
+Description=XCPC Monitor heartbeat
+[Service]
+Type=oneshot
+Environment=HEARTBEATURL=${REPORT}
+ExecStart=/usr/local/bin/xcpc-monitor
+EOF
+
+cat >/etc/systemd/system/xcpc-monitor.timer <<EOF
+[Unit]
+Description=XCPC Monitor heartbeat timer
+[Timer]
+OnBootSec=10s
+OnUnitActiveSec=30s
+AccuracySec=1s
+Unit=xcpc-monitor.service
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now xcpc-monitor.timer
+'"
+```
+
+7) 验证
+
+```bash
+pssh -h ips.txt -l $USER $OPTS "systemctl is-active xcpc-monitor.timer && echo OK"
+# 服务端 UI 的 Monitor 会陆续出现机器；离线超过 2 分钟会进入 #ErrMachine 分组
+```
+
+卸载（可选）
+
+```bash
+pssh -h ips.txt -l $USER $OPTS "sudo systemctl disable --now xcpc-monitor.timer; sudo rm -f /etc/systemd/system/xcpc-monitor.* /usr/local/bin/xcpc-monitor; sudo systemctl daemon-reload"
+```
+
