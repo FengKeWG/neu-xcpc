@@ -298,7 +298,7 @@ UNIT
   fi
   echo "- 初始管理员密码: $(cat "$DOMJUDGE_PREFIX/domserver/etc/initial_admin_password.secret")"
   echo "- REST API 凭据:   $DOMJUDGE_PREFIX/domserver/etc/restapi.secret (judgehost 使用)"
-  echo "- XCPC-TOOLS:     systemctl status xcpc-tools.service (端口由二进制决定，默认行为请参见配置)"
+  echo "- XCPC-TOOLS:     http://<服务器IP>:5283"
   echo
   echo "如需更多 judgedaemon 实例："
   echo "  - 创建运行用户: useradd -d /nonexistent -g domjudge-run -M -s /bin/false domjudge-run-<N>"
